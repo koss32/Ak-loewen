@@ -1,0 +1,93 @@
+/* Release 4 — targeted fixes on top of approved Release 3.
+ * Loaded after style.css so it only overrides the specific points requested.
+ * 1 Standort/legal split · 2 contact-card logos · 3 brand union · 4 VALSET artwork
+ * 5 compact Telegram CTA · 6 mobile drawer motion · 7 gloves in light theme
+ */
+
+/* 1 — Standort block: address only, legal facts live on the Impressum page */
+.address-strip .address-legal{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.address-strip .address-legal .micro{color:var(--ink-3)}
+
+/* 2 — brand logos inside the two contact cards */
+.contact-head{display:flex;align-items:center;gap:14px;margin-bottom:4px}
+.contact-head h3{margin:0}
+.contact-logo{width:54px;height:54px;object-fit:contain;flex:0 0 auto;background:#fff;padding:6px;border:1px solid var(--line)}
+.contact-card.b .contact-logo{background:#0c2340;border-color:#f4cc4655;padding:7px}
+@media(max-width:540px){.contact-logo{width:44px;height:44px}}
+
+/* 3 — AK Löwen × VALSET union composition */
+.brand-union{width:100%}
+.brand-union-stage{position:relative;width:min(360px,100%);aspect-ratio:1;display:grid;place-items:center;margin-inline:auto}
+.brand-union .union-mark{position:absolute;width:62%;height:62%;object-fit:contain;opacity:.92;
+  transition:transform 1.05s cubic-bezier(.16,1,.3,1),opacity .8s ease,filter 1.05s ease}
+.brand-union .union-ak{transform:translate3d(-46%,-6%,0) rotate(-7deg) scale(.92)}
+.brand-union .union-ak{z-index:2}
+.brand-union .union-valset{width:46%;height:46%;transform:translate3d(52%,10%,0) rotate(7deg) scale(.9);background:#0c2340;padding:10px;border:1px solid #f4cc4633}
+.brand-union .union-spark{position:absolute;width:74%;height:74%;border:1px solid var(--accent);opacity:0;transform:rotate(-20deg) scale(.6);
+  transition:transform 1.1s cubic-bezier(.16,1,.3,1),opacity .9s ease}
+.brand-union.is-joined .union-ak{transform:translate3d(-28%,-8%,0) rotate(0) scale(1)}
+.brand-union.is-joined .union-valset{transform:translate3d(34%,20%,0) rotate(0) scale(1)}
+.brand-union.is-joined .union-spark{opacity:.45;transform:rotate(-20deg) scale(1)}
+@media(max-width:800px){.brand-union-stage{width:min(280px,100%)}.brand-union .union-mark{width:66%;height:66%}}
+@media(max-width:540px){.brand-union-stage{width:min(240px,86vw);margin-inline:0}}
+@media(prefers-reduced-motion:reduce){
+ .brand-union .union-mark,.brand-union .union-spark{transition:none!important}
+ .brand-union .union-ak{transform:translate3d(-28%,-8%,0)}
+ .brand-union .union-valset{transform:translate3d(34%,20%,0)}
+ .brand-union .union-spark{opacity:.45;transform:rotate(-20deg) scale(1)}
+}
+
+/* 4 — original /assets/valset.jpg shown in full, no top crop */
+.valset-art{padding:16px;background:var(--b-bg)}
+.valset-art img{aspect-ratio:1;width:100%;height:auto;object-fit:contain;display:block}
+.valset-art{align-self:start}
+.valset-art figcaption{padding-top:20px}
+.entry-top img[src*="valset"]{object-fit:contain;background:#0c2340;padding:6px}
+
+/* 5 — compact Telegram CTA that expands on hover/focus */
+.telegram-booking.tg-compact{gap:0;max-width:none;width:auto;padding:0;border-radius:999px;overflow:hidden;
+  background:#229ED9;border-color:#229ED9;box-shadow:0 12px 30px #0006;
+  transition:transform .28s cubic-bezier(.16,1,.3,1),background .28s ease,box-shadow .28s ease}
+.telegram-booking.tg-compact .tg-icon{display:grid;place-items:center;width:56px;height:56px;flex:0 0 auto}
+.telegram-booking.tg-compact .tg-label{display:block;max-width:0;opacity:0;white-space:nowrap;overflow:hidden;
+  padding-right:0;font-size:13px;letter-spacing:.02em;
+  transition:max-width .34s cubic-bezier(.16,1,.3,1),opacity .24s ease,padding-right .34s ease}
+.telegram-booking.tg-compact:hover,.telegram-booking.tg-compact:focus-visible{transform:translateY(-3px);background:#1b8cc4}
+.telegram-booking.tg-compact:hover .tg-label,
+.telegram-booking.tg-compact:focus-visible .tg-label,
+.telegram-booking.tg-compact.is-open .tg-label{max-width:230px;opacity:1;padding-right:22px}
+.telegram-booking.tg-compact:focus-visible{outline:2px solid #fff;outline-offset:3px}
+@media(hover:none){
+ .telegram-booking.tg-compact .tg-label{max-width:200px;opacity:1;padding-right:18px}
+ .telegram-booking.tg-compact .tg-icon{width:50px;height:50px}
+}
+@media(max-width:540px){.telegram-booking.tg-compact{right:14px;bottom:max(14px,env(safe-area-inset-bottom));padding:0;font-size:12px}}
+@media(prefers-reduced-motion:reduce){.telegram-booking.tg-compact,.telegram-booking.tg-compact .tg-label{transition:none!important}}
+
+/* 6 — mobile drawer: smooth open/close instead of an instant jump */
+@media(prefers-reduced-motion:no-preference){
+ dialog#mobile-menu{translate:100% 0;opacity:0;
+  transition:translate .34s cubic-bezier(.22,1,.36,1),opacity .26s ease,overlay .34s allow-discrete,display .34s allow-discrete}
+ dialog#mobile-menu[open]{translate:0 0;opacity:1}
+ @starting-style{dialog#mobile-menu[open]{translate:100% 0;opacity:0}}
+ dialog#mobile-menu::backdrop{background:#0000;transition:background .34s ease,overlay .34s allow-discrete,display .34s allow-discrete}
+ dialog#mobile-menu[open]::backdrop{background:#000b}
+ @starting-style{dialog#mobile-menu[open]::backdrop{background:#0000}}
+ dialog#mobile-menu[open] .menu-top,dialog#mobile-menu[open]>nav:not(.languages) a,dialog#mobile-menu[open]>.languages{
+  animation:ak-menu-item .42s cubic-bezier(.16,1,.3,1) both}
+ dialog#mobile-menu[open]>nav:not(.languages) a:nth-child(1){animation-delay:.06s}
+ dialog#mobile-menu[open]>nav:not(.languages) a:nth-child(2){animation-delay:.1s}
+ dialog#mobile-menu[open]>nav:not(.languages) a:nth-child(3){animation-delay:.14s}
+ dialog#mobile-menu[open]>nav:not(.languages) a:nth-child(4){animation-delay:.18s}
+ dialog#mobile-menu[open]>nav:not(.languages) a:nth-child(5){animation-delay:.22s}
+ dialog#mobile-menu[open]>nav:not(.languages) a:nth-child(n+6){animation-delay:.26s}
+ dialog#mobile-menu[open]>.languages{animation-delay:.3s}
+}
+@keyframes ak-menu-item{from{opacity:0;transform:translate3d(18px,0,0)}to{opacity:1;transform:none}}
+
+/* 7 — boxing gloves stay visible in the light theme */
+[data-theme="light"] .glove-world{opacity:.42!important}
+[data-theme="light"] .glove{filter:brightness(.68) contrast(1.18) saturate(1.05) drop-shadow(0 26px 26px rgba(20,16,12,.28))}
+[data-theme="light"] .glove-near{opacity:.6}
+[data-theme="light"] .glove-far{opacity:.52}
+@media(max-width:800px){[data-theme="light"] .glove-world{opacity:.34!important}}
