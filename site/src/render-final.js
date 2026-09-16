@@ -1,11 +1,12 @@
 import {render as renderBase} from './render.js';
 import {translations} from './locales.js';
 import {contacts,legal} from './data.js';
+import {applyRelease4} from './release-4-patch.js';
 
 const samboCopy={
  de:'Sambo bedeutet „Selbstverteidigung ohne Waffen“. Die Kampfkunst entstand in der Sowjetunion in den 1920er- und 1930er-Jahren und verbindet Einflüsse aus Judo, verschiedenen Ringstilen und Selbstverteidigungssystemen. Im Training üben wir Griffe, Würfe, Halte- und Bodentechniken; MMA-Elemente ergänzen diese Basis um Schlagtechniken und den Wechsel zwischen Distanzen.',
  ru:'Самбо — это «самооборона без оружия»: система единоборства, сформировавшаяся в СССР в 1920–1930-х годах и вобравшая техники дзюдо, различных видов борьбы и прикладной самообороны. На тренировках мы отрабатываем захваты, броски, удержания и работу в партере; элементы MMA дополняют эту базу ударной техникой и переходами между дистанциями.',
- uk:'Самбо означає «самооборона без зброї». Це єдиноборство сформувалося в СРСР у 1920–1930-х роках і поєднало техніки дзюдо, різних видів боротьби та прикладної самооборони. На тренуваннях ми відпрацьовуємо захвати, кидки, утримання й роботу в партері; елементи MMA доповнюють цю базу ударною технікою та переходами між дистанціями.',
+ uk:'Самбо означае «самооборона без зброї». Це єдиноборство сформувалося в СРСР у 1920–1930-х роках і поєднало техніки дзюдо, різних видів боротьби та прикладної самооборони. На тренуваннях ми відпрацюємо захвати, кидки, утримання й роботу в партері; елементи MMA доповнюють цю базу ударною технікою та переходами між дистанціями.',
  tr:'Sambo, “silahsız öz savunma” anlamına gelir. 1920’ler ve 1930’larda Sovyetler Birliği’nde gelişmiş; judo, farklı güreş stilleri ve öz savunma sistemlerinden teknikleri bir araya getirmiştir. Antrenmanlarda tutuşlar, atışlar, kontrol ve yer teknikleri çalışılır; MMA unsurları bu temeli vuruş teknikleri ve mesafeler arası geçişlerle tamamlar.'
 };
 
@@ -31,5 +32,5 @@ export function render(locale='de',page='',live=false,origin=''){
  html=html.replace(akNeedle,`${active.akEntry}</p></div><img src="/assets/ak-logo.png" alt="AK Löwen" width="112" height="112"></div><a href="#kampfsport"`);
  if(page==='impressum')html=html.replace(/<main id="main" class="legal-page wrap">[\s\S]*?<\/main>/,legalMain(locale));
  const css='<style>.entry-top img[src="/assets/ak-logo.png"]{object-fit:contain;background:#fff;padding:5px}.legal-facts{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin:32px 0}.legal-facts section{padding:24px;border:1px solid var(--line);background:var(--surface)}.legal-facts h2{font-size:20px;margin-bottom:12px}.legal-facts address{font-style:normal;color:var(--ink-2)}@media(max-width:700px){.legal-facts{grid-template-columns:1fr}}</style>';
- return html.replace('</head>',`${css}</head>`);
+ return applyRelease4(html.replace('</head>',`${css}</head>`),locale);
 }

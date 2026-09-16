@@ -8,7 +8,8 @@ test('approved website content and original VALSET artwork are rendered',()=>{
  assert.match(ru,/Ничего специального брать не нужно/);
  assert.doesNotMatch(ru,/Тренер будет рядом/);
  assert.match(ru,/\/assets\/valset\.jpg/);
- assert.doesNotMatch(ru,/\/assets\/valset-logo\.svg/);
+ assert.match(ru,/<figure class="valset-art"><img src="\/assets\/valset\.jpg"/);
+ assert.doesNotMatch(ru,/class="valset-art"><img src="\/assets\/valset-logo\.svg"/);
  assert.match(ru,/Namih Aliyev/);
  assert.match(ru,/AK Löwen[^]*\/assets\/ak-logo\.png/);
 });
