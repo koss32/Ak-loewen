@@ -2,13 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {render} from '../src/render-final.js';
 
-test('approved website content and supplied VALSET logo are rendered',()=>{
+test('approved website content and original VALSET artwork are rendered',()=>{
  const ru=render('ru');
  assert.match(ru,/Самбо — это «самооборона без оружия»/);
  assert.match(ru,/Ничего специального брать не нужно/);
  assert.doesNotMatch(ru,/Тренер будет рядом/);
- assert.match(ru,/\/assets\/valset-logo\.svg/);
- assert.doesNotMatch(ru,/\/assets\/valset\.jpg/);
+ assert.match(ru,/\/assets\/valset\.jpg/);
+ assert.doesNotMatch(ru,/\/assets\/valset-logo\.svg/);
  assert.match(ru,/Namih Aliyev/);
  assert.match(ru,/AK Löwen[^]*\/assets\/ak-logo\.png/);
 });
