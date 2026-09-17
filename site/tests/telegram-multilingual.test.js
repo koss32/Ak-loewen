@@ -16,7 +16,7 @@ test('new users always start in German regardless of Telegram language_code',asy
  for(const languageCode of languageCodes){
   const store=createMemoryBotStore(),bot=createTelegramBot({store,config:cfg});
   await bot.handle(msg(1,10,'/start',10,languageCode));
-  assert.equal((await last(store)).text,'AK LÖWEN × VALSET. Bitte wähle eine Aktion.',String(languageCode));
+  assert.equal((await last(store)).text,'AK-LOEWEN × VALSET. Bitte wähle eine Aktion.',String(languageCode));
   assert.equal((await store.inspect()).clients['10'].locale,'de');
   const main=(await last(store)).meta.reply_markup.inline_keyboard.flat();
   assert.ok(main.some(b=>b.callback_data==='cmd:book'&&b.text==='Probetraining anfragen'));
