@@ -1,4 +1,4 @@
-/* Release 4 — progressive enhancement for the AK Löwen × VALSET union.
+/* Release 4 — progressive enhancement for the AK-LOEWEN × VALSET union.
  * Without JS the composition is still fully visible; motion is skipped for
  * prefers-reduced-motion users (CSS renders the joined end state statically).
  */

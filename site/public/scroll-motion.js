@@ -1,6 +1,7 @@
 /* ScrollCraft-inspired choreography, progressively enhanced.
  * Content is visible without JS. Native scrolling and all form controls stay untouched.
  * No additional scroll listener, framework or perpetual animation loop.
+ * The three polished card sections are handled exclusively by section-polish.js.
  */
 (() => {
  'use strict';
@@ -14,11 +15,8 @@
   ['.entry-card','card'],
   ['.section-head,.valset-top,#valset-groups>h3','heading'],
   ['.section-intro,.trial-layout>div:first-child,.address-strip,.footer-invitation','flow'],
-  ['.discipline','card'],
   ['.trainer-card','portrait'],
   ['.price-card','price'],
-  ['.first-visit-steps>li','step'],
-  ['.contact-card','card'],
   ['.about-grid>div,.valset-grid>div','flow'],
   ['.valset-art','scene'],
   ['.val-group','flow']

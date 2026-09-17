@@ -15,7 +15,7 @@
 .contact-card.b .contact-logo{background:#fff;border-color:#f4cc4655;padding:0;object-fit:cover;object-position:50% 7%}
 @media(max-width:540px){.contact-logo{width:44px;height:44px}}
 
-/* 3 — AK Löwen × VALSET union composition (cinematic impact) */
+/* 3 — AK-LOEWEN × VALSET union composition (cinematic impact) */
 .brand-union{--rx:0deg;--ry:0deg}
 .brand-union .brand-union-stage{perspective:1000px;transform-style:preserve-3d;
   transform:rotateX(var(--rx)) rotateY(var(--ry));transition:transform .5s cubic-bezier(.16,1,.3,1)}
