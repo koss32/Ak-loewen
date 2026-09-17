@@ -11,7 +11,7 @@ export const familyCopy = {
  },
  de:{
   coachApproachTitle:'So gelingt der Einstieg',
-  namigBio:'Namig Aliyev ist Trainer für Boxen. Im Probetraining lernst du deinen Trainer kennen und machst deine ersten Schritte im Boxen – auch ohne Vorerfahrung.',
+  namigBio:'Namih Aliyev ist Trainer für Boxen. Im Probetraining lernst du deinen Trainer kennen und machst deine ersten Schritte im Boxen – auch ohne Vorerfahrung.',
   namigApproach:'Der Trainer begrüßt dich, erklärt die Übungen und hilft dir, in der Gruppe anzukommen. Du musst nicht vorbereitet sein: Wir beginnen mit dem Kennenlernen und verständlichen ersten Schritten.',
   anarBio:'Anar Karimov ist Trainer für Sambo & MMA. Der Einstieg beginnt nicht mit Leistungsanforderungen, sondern mit dem Kennenlernen des Trainers und der Gruppe.',
   anarAchievement:'Weltmeister in der Altersklasse unter 20 Jahren',
@@ -27,7 +27,7 @@ export const familyCopy = {
  },
  tr:{
   coachApproachTitle:'Yeni başlayanlara nasıl destek oluyoruz?',
-  namigBio:'Namig Aliyev boks antrenörüdür. Deneme dersinde antrenörünle tanışır ve daha önce antrenman yapmamış olsan da boksta ilk adımlarını atarsın.',
+  namigBio:'Namih Aliyev boks antrenörüdür. Deneme dersinde antrenörünle tanışır ve daha önce antrenman yapmamış olsan da boksta ilk adımlarını atarsın.',
   namigApproach:'Antrenör seni karşılar, hareketleri açıklar ve gruba alışmana yardımcı olur. Önceden hazırlanmış olman gerekmez; tanışarak ve anlaşılır ilk adımlarla başlarız.',
   anarBio:'Anar Karimov, Sambo & MMA antrenörüdür. Spora başlangıç, performans beklentileriyle değil, antrenör ve grupla tanışmakla başlar.',
   anarAchievement:'20 yaş altı dünya şampiyonu',
