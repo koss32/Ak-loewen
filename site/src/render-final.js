@@ -29,7 +29,7 @@ export function render(locale='de',page='',live=false,origin=''){
  let html=renderBase(locale,page,live,origin);
  html=html.replace(active.samboDesc,samboCopy[locale]||samboCopy.de);
  const akNeedle=`${active.akEntry}</p></div></div><a href="#kampfsport"`;
- html=html.replace(akNeedle,`${active.akEntry}</p></div><img src="/assets/ak-logo.png" alt="AK Löwen" width="112" height="112"></div><a href="#kampfsport"`);
+ html=html.replace(akNeedle,`${active.akEntry}</p></div><img src="/assets/ak-logo.png" alt="AK-LOEWEN" width="112" height="112"></div><a href="#kampfsport"`);
  if(page==='impressum')html=html.replace(/<main id="main" class="legal-page wrap">[\s\S]*?<\/main>/,legalMain(locale));
  const css='<style>.entry-top img[src="/assets/ak-logo.png"]{object-fit:contain;background:#fff;padding:5px}.legal-facts{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin:32px 0}.legal-facts section{padding:24px;border:1px solid var(--line);background:var(--surface)}.legal-facts h2{font-size:20px;margin-bottom:12px}.legal-facts address{font-style:normal;color:var(--ink-2)}@media(max-width:700px){.legal-facts{grid-template-columns:1fr}}</style>';
  return applyRelease4(html.replace('</head>',`${css}</head>`),locale);
