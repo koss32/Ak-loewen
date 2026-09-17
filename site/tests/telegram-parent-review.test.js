@@ -79,7 +79,7 @@ test('staff prompts work with Telegram group privacy and previews can be edited 
 test('private staff user can use client commands when no staff composition is active',async()=>{
  const store=createMemoryBotStore(),bot=createTelegramBot({store,config:{...config,staffChatId:'55'}});
  await bot.handle(message(1,'/start',55));
- assert.match((await recent(store,55)).text,/AK LÖWEN/);
+ assert.match((await recent(store,55)).text,/AK-LOEWEN/);
 });
 
 test('configuration assessment never returns a bot token and supports info-only workers without staff',()=>{

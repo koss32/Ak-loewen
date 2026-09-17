@@ -9,13 +9,13 @@ try{
   const errors=[];page.on('pageerror',error=>errors.push(error.message));
   await page.goto(base+'/de/');
   await page.locator('#trainer').scrollIntoViewIfNeeded();
-  const portrait=page.locator('.trainer-card').filter({hasText:'Namig Aliyev'}).locator('img');
+  const portrait=page.locator('.trainer-card').filter({hasText:'Namih Aliyev'}).locator('img');
   await portrait.waitFor({state:'visible'});
   await portrait.evaluate(image=>image.decode());
-  assert.equal(await portrait.getAttribute('alt'),'Namig Aliyev');
+  assert.equal(await portrait.getAttribute('alt'),'Namih Aliyev');
   assert.ok((await portrait.evaluate(image=>image.complete&&image.naturalWidth>0)));
   assert.match(await portrait.evaluate(image=>image.currentSrc),/namig-(480|960)\.(avif|webp|jpg)$/);
-  assert.equal(await page.locator('.trainer-card').filter({hasText:'Namig Aliyev'}).locator('figcaption').count(),0);
+  assert.equal(await page.locator('.trainer-card').filter({hasText:'Namih Aliyev'}).locator('figcaption').count(),0);
   assert.deepEqual(errors,[]);
   await page.screenshot({path:`test-results/release-a/namig-${width}.png`,fullPage:false});
   await page.close();
