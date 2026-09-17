@@ -24,7 +24,7 @@ export const schedules = [
  {id:'val-senior-week',weekdayIds:[1,3,5],startTime:'17:00',endTime:'18:00'}
 ].map(s=>({...s,timezone:'Europe/Berlin'}));
 export const trainers = [
- {id:'anar',programId:'sambo-mma',name:'Anar Karimov',languages:['ru','tr','uk'],image:'coach.webp',portraitStatus:'illustration',bioKey:'anarBio',approachKey:'anarApproach',achievementKey:'anarAchievement',biographyStatus:'owner-supplied',achievementsStatus:'owner-supplied'},
+ {id:'anar',programId:'sambo-mma',name:'Anar Karimov',languages:['ru','tr','uk'],image:'anar',portraitStatus:'approved',bioKey:'anarBio',approachKey:'anarApproach',achievementKey:'anarAchievement',biographyStatus:'owner-supplied',achievementsStatus:'owner-supplied'},
  {id:'namig',programId:'boxen',name:'Namih Aliyev',languages:[],image:'namig',portraitStatus:'approved',instagram:'https://www.instagram.com/aliyev__11',bioKey:'namigBio',approachKey:'namigApproach',biographyStatus:'owner-supplied',achievementsStatus:'not-listed'}
 ];
 export const contacts = {
