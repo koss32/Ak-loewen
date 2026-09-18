@@ -73,7 +73,7 @@ export function createWebhookHandler({env=process.env,createRuntime=createBotRun
     if(typeof runtime.hasPendingCleanupForUpdate==='function'&&await runtime.hasPendingCleanupForUpdate(update.update_id)){
      try{
       await sleep(INTERFACE_CLEANUP_DELAY_MS);
-      await runtime.drain({limit:10,timeoutMs:4000,maxDurationMs:6000,sourceUpdateId:update.update_id,includeBackground:true});
+      await runtime.drain({limit:50,timeoutMs:1500,maxDurationMs:8000,sourceUpdateId:update.update_id,includeBackground:true});
      }catch{/* cosmetic cleanup must never make Telegram retry the whole update */}
     }
    }catch{return json(res,503,{ok:false,code:'retry'});}
