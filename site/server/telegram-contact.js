@@ -21,11 +21,11 @@ export function pauseContact(tx,chatId,user,locale){
  // Preserve the approved booking/FAQ navigation behavior.
  if(session?.stage==='contact')tx.putSession(chatId,{locale,stage:'idle'});
 }
-export function startContact(tx,chatId,user,locale,{ready,privacyUrl}){
+export function startContact(tx,chatId,user,locale,{ready}){
  if(!ready){send(tx,chatId,copy(locale).unavailable);return;}
  tx.putClient(user.id,{locale,contactPaused:false});
  tx.putSession(chatId,{locale,stage:'contact'});
- send(tx,chatId,`${copy(locale).prompt}${privacyUrl?`\n\n${privacyUrl}`:''}`,{reply_markup:inline([[{text:'↩️',callback_data:'cmd:menu'}]])});
+ send(tx,chatId,copy(locale).prompt,{reply_markup:inline([[{text:'↩️',callback_data:'cmd:menu'}]]),privateUi:true,supersedesDisposableUi:true});
 }
 
 /** Booking stages have priority; no booking fields or phone numbers enter tickets. */

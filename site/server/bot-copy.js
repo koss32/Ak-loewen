@@ -31,6 +31,12 @@ Object.assign(base.ru,{faqButton:'Частые вопросы',faqTitle:'Выб�
 Object.assign(base.uk,{faqButton:'Часті запитання',faqTitle:'Оберіть запитання.',faqTrial:'Пробне заняття безкоштовне?',faqEquipment:'Що потрібно для першого заняття?',faqFirst:'Як проходить перше заняття?',faqLocation:'Де проходять заняття?'});
 Object.assign(base.tr,{faqButton:'Sık sorulan sorular',faqTitle:'Hangi konuda bilgi almak istersin?',faqTrial:'Deneme dersi ücretsiz mi?',faqEquipment:'İlk ders için ne gerekiyor?',faqFirst:'İlk ders nasıl geçiyor?',faqLocation:'Dersler nerede yapılıyor?'});
 for(const locale of Object.keys(contactCopy))Object.assign(base[locale],{book:contactCopy[locale].book,contactButton:contactCopy[locale].contact,languageButton:contactCopy[locale].languageButton});
+// Telegram booking deliberately uses the account's profile name and a phone only.
+// Keep the website's independent form labels and validators untouched.
+Object.assign(base.de,{privacy:'Bitte Datenschutz bestätigen.',consent:'Zustimmen',consentDecline:'Ablehnen',privacyButton:'Datenschutz',contactName:'Bitte Telefonnummer eingeben.',badContact:'Bitte eine gültige Telefonnummer eingeben.',comment:'Kommentar (optional).',anonymous:'Telegram-Nutzer'});
+Object.assign(base.ru,{privacy:'Примите Datenschutz.',consent:'Согласиться',consentDecline:'Отказаться',privacyButton:'Datenschutz',contactName:'Введите номер телефона.',badContact:'Введите действительный номер телефона.',comment:'Комментарий (необязательно).',anonymous:'Пользователь Telegram'});
+Object.assign(base.uk,{privacy:'Підтвердьте Datenschutz.',consent:'Погодитися',consentDecline:'Відмовитися',privacyButton:'Datenschutz',contactName:'Введіть номер телефону.',badContact:'Введіть дійсний номер телефону.',comment:'Коментар (необов’язково).',anonymous:'Користувач Telegram'});
+Object.assign(base.tr,{privacy:'Datenschutz’u kabul edin.',consent:'Kabul et',consentDecline:'Reddet',privacyButton:'Datenschutz',contactName:'Telefon numaranızı girin.',badContact:'Geçerli bir telefon numarası girin.',comment:'Yorum (isteğe bağlı).',anonymous:'Telegram kullanıcısı'});
 export const botCopy=base;
 export const DEFAULT_LOCALE='de';
 export const normalizeLocale=value=>{const v=String(value||'').toLowerCase().replace(/_/g,'-');const code=v.split('-')[0];return code==='ua'?'uk':['de','ru','uk','tr'].includes(code)?code:null;};

@@ -42,6 +42,21 @@ export function classifyTelegramResponse(response,body,method='sendMessage'){
 
 // Telegram has no idempotency key for sendMessage. Uncertain sends are terminal,
 // not automatically retried. Durable feedback makes this visible to the sender.
+function trackDisposableUi(state,item,result,now){
+ if(result.state!=='sent'||item.method!=='sendMessage'||!item.meta?.privateUi||!(item.meta?.disposableUi||item.meta?.supersedesDisposableUi))return;
+ const messageId=result.messageId,recipient=String(item.recipient);
+ // Only client private chats are tagged at enqueue time. Recheck the positive
+ // numeric identity and an existing client record before any delete is queued.
+ if(!Number.isSafeInteger(messageId)||messageId<1||!/^\d+$/.test(recipient)||!Number.isSafeInteger(Number(recipient))||Number(recipient)<1)return;
+ const client=state.clients[recipient];if(!client)return;
+ const previous=client.disposableUiMessageId;
+ if(Number.isSafeInteger(previous)&&previous>0&&previous!==messageId){
+  const tx=txFacade(state,{now,updateId:item.sourceUpdateId??null,nonce:'cleanup:'+item.id});
+  tx.enqueue(recipient,'','interface-cleanup',now+1000,{privateUi:true,trackedDisposableCleanup:true},'deleteMessage',{chat_id:recipient,message_id:previous});
+ }
+ if(item.meta.disposableUi)client.disposableUiMessageId=messageId;
+ else if(item.meta.supersedesDisposableUi)delete client.disposableUiMessageId;
+}
 function contactFeedback(state,item,result,now){
  const feedback=item.meta?.feedback;
  if(!feedback||item.feedbackQueued||!['sent','failed','uncertain'].includes(result.state))return;
@@ -177,7 +192,7 @@ function createStore({readSnapshot,commitSnapshot,clock,maxBytes=BOT_MAX_STATE_B
   hasPendingImmediateForUpdate:async updateId=>{const state=normalized((await readSnapshot()).state),source=String(updateId);pruneState(state,clock());return Object.values(state.outbox).some(item=>item.sourceUpdateId===source&&!BACKGROUND_KINDS.has(item.kind)&&['queued','leased','sending'].includes(item.state));},
   hasPendingCleanupForUpdate:async updateId=>{const state=normalized((await readSnapshot()).state),source=String(updateId);pruneState(state,clock());return Object.values(state.outbox).some(item=>item.sourceUpdateId===source&&item.kind==='interface-cleanup'&&['queued','leased','sending'].includes(item.state));},
   beginDelivery:(itemId,fence,leaseMs=30000)=>mutate(tx=>{const item=tx.raw.outbox[String(itemId)];if(!item||item.state!=='leased'||item.lease?.fence!==fence||item.lease.until<=tx.now)return undefined;const blockedUntil=tx.raw.recipientBlockedUntil[item.recipient]||0;if(blockedUntil>tx.now){item.state='queued';item.notBefore=Math.max(item.notBefore,blockedUntil);item.lease=null;return undefined;}if(item.meta?.safeAfterClose&&tx.getTicket(item.meta.ticketId)?.status!=='OPEN'){item.meta.reply_markup={inline_keyboard:[]};item.meta.contactCard=false;}if(item.meta?.requireOpen&&tx.getTicket(item.meta.ticketId)?.status!=='OPEN'){item.state='cancelled';item.lease=null;return undefined;}if(item.kind==='reminder'){const req=tx.getRequest(item.meta?.requestId),appointment=req?.appointment;if(!req||req.status!=='confirmed'||!req.reminders?.enabled||req.clientChatId!==item.recipient||req.appointmentRevision!==item.meta?.appointmentRevision||appointment!==item.meta?.appointment||!Number.isFinite(appointment)||tx.now>=appointment){item.state='cancelled';item.lease=null;return undefined;}const allowedAt=nextAllowedReminderTime(tx.now,appointment);if(allowedAt===null){item.state='cancelled';item.lease=null;return undefined;}if(allowedAt>tx.now){item.state='queued';item.notBefore=allowedAt;item.lease=null;return undefined;}}item.state='sending';item.lease.until=tx.now+leaseMs;return clone(item);}),
-  finishDelivery:(itemId,fence,result)=>mutate(tx=>{const item=tx.raw.outbox[String(itemId)];if(!item||item.state!=='sending'||item.lease?.fence!==fence)return false;if(result.state==='deferred'){item.state='queued';item.notBefore=tx.now+result.retryAfter*1000;tx.raw.recipientBlockedUntil[item.recipient]=item.notBefore;item.lease=null;return true;}item.state=result.state;item.messageId=result.messageId;item.finishedAt=tx.now;item.lease=null;contactFeedback(tx.raw,item,result,tx.now);return true;}),
+  finishDelivery:(itemId,fence,result)=>mutate(tx=>{const item=tx.raw.outbox[String(itemId)];if(!item||item.state!=='sending'||item.lease?.fence!==fence)return false;if(result.state==='deferred'){item.state='queued';item.notBefore=tx.now+result.retryAfter*1000;tx.raw.recipientBlockedUntil[item.recipient]=item.notBefore;item.lease=null;return true;}item.state=result.state;item.messageId=result.messageId;item.finishedAt=tx.now;item.lease=null;trackDisposableUi(tx.raw,item,result,tx.now);contactFeedback(tx.raw,item,result,tx.now);return true;}),
   inspect:async()=>normalized((await readSnapshot()).state)
  };
 }

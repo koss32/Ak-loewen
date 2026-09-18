@@ -4,7 +4,7 @@ import {assessBotConfig,validPublicOrigin} from '../server/bot-config.js';
 import {waitUntil} from '@vercel/functions';
 export const config={api:{bodyParser:false}};
 const LIMIT=128*1024;
-const INTERFACE_CLEANUP_DELAY_MS=2000;
+const INTERFACE_CLEANUP_DELAY_MS=1000;
 const json=(res,status,body)=>{res.setHeader('Cache-Control','no-store');res.status(status).json(body);};
 const scalar=value=>typeof value==='string'?value:'';
 

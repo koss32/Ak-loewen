@@ -24,7 +24,7 @@ function telegramUiStore(store){
     const enqueue=tx.enqueue.bind(tx),view=Object.create(tx);
     view.enqueue=(recipient,text,kind='message',notBefore=tx.now,meta={},method='sendMessage',payload)=>{
      let nextText=text,nextNotBefore=notBefore,nextMeta=meta;
-     if(kind==='interface-cleanup')nextNotBefore=tx.now+2000;
+     if(kind==='interface-cleanup')nextNotBefore=tx.now+1000;
      if(kind==='message'&&typeof nextText==='string'){
       const prompt=[...cancelPrompts].find(value=>nextText===value||nextText.startsWith(`${value}\n`));
       if(prompt)nextText=prompt;
