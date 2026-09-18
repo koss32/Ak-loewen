@@ -67,16 +67,19 @@ export function createWebhookHandler({env=process.env,createRuntime=createBotRun
     await runtime.drain({limit:10,maxDurationMs:WEBHOOK_DRAIN_BUDGET_MS,sourceUpdateId:update.update_id});
     if(await runtime.hasPendingImmediateForUpdate(update.update_id))return json(res,503,{ok:false,code:'retry'});
     // Cleanup is deliberately delayed so Telegram users can see the transition.
-    // Register it after the response so the callback itself stays fast; a failed
-    // cleanup remains recoverable by the regular worker.
+    // Run it inside this webhook invocation instead of relying on post-response
+    // waitUntil: worker/reminders stay disabled in Production, so otherwise a
+    // queued cosmetic delete may never be picked up.
     if(typeof runtime.hasPendingCleanupForUpdate==='function'&&await runtime.hasPendingCleanupForUpdate(update.update_id)){
-     const cleanup=async()=>{try{await sleep(INTERFACE_CLEANUP_DELAY_MS);await runtime.drain({limit:10,maxDurationMs:29000,sourceUpdateId:update.update_id,includeBackground:true});}catch{/* keep the cleanup queued for worker recovery */}};
-     try{waitUntilTask(cleanup());}catch{/* Vercel waitUntil is unavailable in local adapters; worker recovery remains available. */}
+     try{
+      await sleep(INTERFACE_CLEANUP_DELAY_MS);
+      await runtime.drain({limit:10,timeoutMs:4000,maxDurationMs:6000,sourceUpdateId:update.update_id,includeBackground:true});
+     }catch{/* cosmetic cleanup must never make Telegram retry the whole update */}
     }
    }catch{return json(res,503,{ok:false,code:'retry'});}
    return json(res,200,{ok:true,dropped:Boolean(result?.dropped)});
   }catch{return json(res,503,{ok:false,code:'retry'});}
  };
 }
-export const WEBHOOK_DRAIN_BUDGET_MS=25000;
+export const WEBHOOK_DRAIN_BUDGET_MS=20000;
 export default createWebhookHandler();
