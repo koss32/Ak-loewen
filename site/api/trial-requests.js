@@ -1,10 +1,23 @@
 import {Redis} from '@upstash/redis';
 import {createHostedTrialService,createUpstashLedger} from '../server/hosted-trial.js';
 import {assessFormConfig,createFormRedis} from '../server/form-config.js';
+import {normalizePublicOrigin} from '../server/site-config.js';
 
 export const config={api:{bodyParser:{sizeLimit:'8kb'}}};
 
 function json(res,status,body){res.setHeader('Cache-Control','no-store');res.status(status).json(body);}
+
+function productionOrigins(env,configured){
+ const allowed=new Set(configured?[configured]:[]);
+ if(env.VERCEL_ENV!=='production')return allowed;
+ for(const value of [env.VERCEL_PROJECT_PRODUCTION_URL,env.VERCEL_BRANCH_URL,env.VERCEL_URL]){
+  const raw=typeof value==='string'?value.trim():'';
+  if(!raw)continue;
+  const origin=normalizePublicOrigin(raw.includes('://')?raw:`https://${raw}`);
+  if(origin)allowed.add(origin);
+ }
+ return allowed;
+}
 
 /** Injectable factory keeps endpoint policy testable without a Redis/network call. */
 export function createTrialRequestsHandler({env=process.env,RedisClient=Redis,createService=createHostedTrialService}={}){
@@ -15,7 +28,7 @@ export function createTrialRequestsHandler({env=process.env,RedisClient=Redis,cr
   if(!req.headers['content-type']?.startsWith('application/json'))return json(res,415,{ok:false,code:'content_type'});
   // Origin is optional for non-browser/no-JS submissions, but when supplied it
   // must match the configured canonical HTTPS origin exactly. Never trust Host.
-  if(req.headers.origin&&req.headers.origin!==checked.origin)return json(res,403,{ok:false,code:'origin'});
+  if(req.headers.origin&&!productionOrigins(env,checked.origin).has(normalizePublicOrigin(req.headers.origin)))return json(res,403,{ok:false,code:'origin'});
   if(Number(req.headers['content-length'])>8192)return json(res,413,{ok:false,code:'too_large'});
   try{
    const redis=createFormRedis(env,RedisClient);
