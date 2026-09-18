@@ -183,7 +183,7 @@ function createStore({readSnapshot,commitSnapshot,clock,maxBytes=BOT_MAX_STATE_B
     const active=items.some(other=>other.recipient===item.recipient&&other.id!==item.id&&['leased','sending'].includes(other.state));
     // A queued reminder must not hold up an interactive reply. Active delivery
     // locks and Telegram rate-limit blocks still apply to the entire recipient.
-    const olderDue=items.some(other=>other.recipient===item.recipient&&other.id!==item.id&&other.sequence<item.sequence&&other.state==='queued'&&other.notBefore<=now&&(allowCare||!['reminder','checkin'].includes(other.kind))&&!(selectedSource!==null&&immediateOnly&&BACKGROUND_KINDS.has(other.kind)));
+    const olderDue=items.some(other=>other.recipient===item.recipient&&other.id!==item.id&&other.sequence<item.sequence&&other.state==='queued'&&other.notBefore<=now&&(allowCare||!['reminder','checkin'].includes(other.kind))&&!(selectedSource!==null&&BACKGROUND_KINDS.has(other.kind)&&other.sourceUpdateId!==selectedSource));
     if(active||olderDue)continue;
     item.state='leased';item.attempts++;item.lease={workerId:String(workerId),fence:tx.newToken(20),until:now+leaseMs};return clone(item);
    }
