@@ -24,9 +24,9 @@ function legalMain(locale){
  return `<main id="main" class="legal-page wrap"><span class="eyebrow">${c.title}</span><h1>${c.heading}</h1><div class="legal-facts"><section><h2>${esc(legal.entityName)}</h2><address>${esc(legal.registeredAddress)}<br>${esc(legal.country)}</address></section><section><h2>${c.represented}</h2><p>${esc(legal.manager)}</p></section><section><h2>${c.contact}</h2><p>Telefon: <a href="tel:+4915730447730">${esc(legal.phone)}</a><br>E-Mail: <a href="mailto:${esc(contacts.email)}">${esc(contacts.email)}</a></p></section><section><h2>${c.register}</h2><p>${c.court}: ${esc(legal.registerCourt)}<br>${c.number}: ${esc(legal.registerNumber)}</p></section></div><a href="/${locale}/" class="btn">${c.back} <span aria-hidden="true">↗</span></a></main>`;
 }
 
-export function render(locale='de',page='',live=false,origin=''){
+export function render(locale='de',page='',live=false,origin='',indexing=false){
  const active=translations[locale]||translations.de;
- let html=renderBase(locale,page,live,origin);
+ let html=renderBase(locale,page,live,origin,indexing);
  html=html.replace(active.samboDesc,samboCopy[locale]||samboCopy.de);
  const akNeedle=`${active.akEntry}</p></div></div><a href="#kampfsport"`;
  html=html.replace(akNeedle,`${active.akEntry}</p></div><img src="/assets/ak-logo.png" alt="AK-LOEWEN" width="112" height="112"></div><a href="#kampfsport"`);

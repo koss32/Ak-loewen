@@ -1,61 +1,55 @@
-# AK LÖWEN project rules
+# AK-LOEWEN — правила проекта
 
-## Project model
+## Модель проекта
 
-This repository contains one product: **AK LÖWEN**.
+В репозитории находится один продукт **AK-LOEWEN**:
 
-Its executable application contains:
+- лендинг и локализованные страницы;
+- backend/API, включая web-форму пробной тренировки;
+- Telegram-интеграция для booking, статуса и связи с командой.
 
-- the AK LÖWEN landing page;
-- backend/API used by the landing;
-- the Telegram bot integration connected to the same booking/customer flow.
+Telegram — часть приложения, а не отдельный проект и не отдельная линия релизов.
 
-Telegram is an integration of AK LÖWEN, not a separate project and not a separate release line.
+## Текущий релиз
 
-## Release model
+- `release-5` — стабильный утверждённый baseline: `c52e77dcde8548e00f2e6208b143dc87c37f811e`.
+- `release-6` — единственная рабочая ветка текущего продолжения. Кандидатный SHA берётся из проверенного HEAD финальной передачи; synthetic SHA не используется.
+- `RELEASE-2.md` и `RELEASE-3.md` — исторические записи, не текущий source of truth.
+- Статус, ограничения и доказательства текущего релиза: `docs/releases/RELEASE-6.md`, `RELEASE-6-CONTINUATION.md` и `release-6-evidence/`.
 
-- `release-2` — approved AK LÖWEN landing baseline.
-- `release-3` — current AK LÖWEN release: landing + Telegram integration work.
-- Future versions use `release-N` for the whole project.
+Не создавайте отдельные версии для сайта, бота, handoff, preview или подсистем.
 
-Do not create separate version schemes for website, bot, handoff, agents, previews or individual subsystems.
+## Обязательные границы
 
-## Read order
+- Не менять `release-5`, default branch, aliases или Production.
+- Не делать deployment, не включать Production delivery, Telegram webhook, scheduler, reminders или indexing без отдельной явной команды владельца.
+- Не отправлять реальные заявки, Telegram-сообщения или менять Redis во время локальной проверки.
+- Не записывать секреты в Git, документацию, логи, screenshots или отчёты. Наличие переменной окружения не доказывает работоспособность credentials.
+- Worker/reminders — `DISABLED / FUTURE CAPABILITY`; scheduler не является требованием запуска.
+- Не переписывать утверждённые legal-тексты и не менять факты, брендинг, тренеров, цены, расписание, адреса и контакты без подтверждения.
+- Не выдавать локальные mocks, unit-тесты или наличие env за deployed readiness.
 
-1. `README.md`
-2. `docs/README.md`
-3. relevant `docs/releases/RELEASE-N.md`
-4. for Telegram work: `docs/integrations/telegram/README.md`
-5. for code ownership: `docs/architecture/AI-MAP.md`
+## Структура и маршрутизация изменений
 
-## Directory ownership
+- `site/` — исполняемое приложение и deployment root.
+- `site/src/data.js` — фактические данные и legal state.
+- `site/src/locales.js`, `site/src/*-copy.js` — copy локалей.
+- `site/src/render.js`, `site/src/render-final.js` — разметка.
+- `site/public/` — браузерные assets и поведение.
+- `site/api/` — HTTP boundaries Vercel.
+- `site/server/` — runtime, validation, Redis, Telegram и form services.
+- `site/server/indexing-config.js` — единая политика indexing/robots/sitemap.
+- `site/middleware.js` — request-time `X-Robots-Tag`, robots и canonical-host gate через Vercel proxy entrypoint.
+- `site/build.js` — очищает и генерирует `dist`, localized/legal pages, robots и standalone Release 6 review artifact.
+- `site/tests/` — тесты всего приложения.
+- `docs/` — текущая документация; `archive/` — только исторический материал; `tools/` — development tools.
 
-- `site/` — executable AK LÖWEN application: landing, API, server and Telegram integration.
-- `docs/` — current project documentation.
-- `archive/` — historical material only.
-- `tools/` — development tools.
+## Indexing и readiness
 
-Do not create new `HANDOFF`, `START-HERE`, `CURRENT-HANDOFF`, agent-name or date-coded status files. Update the current Release document or the relevant integration document.
+Indexing по умолчанию выключен. Для indexable output одновременно нужны `INDEXING_ENABLED=true`, настоящий Vercel Production runtime (`VERCEL=1`, `VERCEL_ENV=production`, без непроизводственного target), валидный canonical HTTPS `PUBLIC_ORIGIN` и запрос именно с этого origin. Preview, local, custom/noncanonical hosts, API, review artifact и Telegram Privacy остаются noindex.
 
-## Current implementation rules
+Web-form readiness — отдельная политика: `FORM_DELIVERY_ENABLED`, legal publication/version, canonical origin, отрицательный Telegram group ID и полная same-provider Redis URL/token pair. Локально дополнительно требуется `LOCAL_FORM_DELIVERY_ENABLED=true`; одних унаследованных credentials недостаточно.
 
-- Legal/customer identity is **AK-LOEWEN gGmbH**.
-- VALSET content may be presented inside the landing but is not a second repository/application.
-- Keep DE/RU/UK/TR support where already implemented.
-- Do not invent trainers, awards, experience, prices, schedules, contacts, legal text or testimonials.
-- Secrets stay server-side and must never be committed.
-- Do not enable Production delivery, Production Telegram webhook, Production scheduler or Production deployment without explicit authorization.
-- Historical verification never proves a later revision.
+## Документация
 
-## Code routing inside `site/`
-
-- landing data → `src/data.js`
-- landing copy → `src/locales.js`, `src/*-copy.js`
-- landing markup → `src/render.js`
-- browser behavior → `public/client.js`
-- styles → `public/style.css`
-- Telegram integration → `server/telegram-bot.js`, `server/bot-*.js`, `api/telegram-*.js`
-- staff authorization → `server/telegram-staff.js`
-- tests → `tests/`
-
-After changes, update the project Release status. Do not create another handoff file.
+Начинайте с `README.md`, затем `docs/README.md`, текущих release-6 документов и relevant integration/development map. Исторические Release 2/3 документы сохраняются и должны быть явно прочитаны как история. Не создавайте новый handoff/version scheme: обновляйте существующие current documents.

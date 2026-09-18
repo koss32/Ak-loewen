@@ -1,66 +1,63 @@
-# AK LÖWEN — architecture map
+# AK-LOEWEN — карта архитектуры Release 6
 
-This map describes the current **Release 3** structure.
+## Модель продукта
 
-## Product model
-
-There is one application: **AK LÖWEN**.
+Один проект:
 
 ```text
-AK LÖWEN
-├─ Landing / website
-├─ Booking backend + API
+AK-LOEWEN
+├─ localized landing + legal pages
+├─ web trial-request form/API
 └─ Telegram integration
-   ├─ client bot flow
-   ├─ staff flow
-   ├─ webhook
-   ├─ worker / reminders
-   └─ Redis state/outbox
+   ├─ client booking/status/contact
+   ├─ staff authorization and replies
+   ├─ webhook boundary
+   ├─ optional worker/reminder capability (disabled/future)
+   └─ Redis state/idempotency/outbox
 ```
 
-Telegram is not a separate project and does not have its own release line.
+Telegram не имеет отдельной версии. Исторические Release 2/3 документы не описывают текущий source of truth.
 
-## Active branch / release
+## Ветки и статус
 
-- Approved previous release: `release-2`.
-- Current work: `release-3`.
-- Current release status: WIP / Preview.
-- Current release source of truth: `docs/releases/RELEASE-3.md`.
+- `release-5` — стабильный неизменяемый baseline `c52e77dcde8548e00f2e6208b143dc87c37f811e`.
+- `release-6` — текущая рабочая ветка; Phase 1 завершена, Phase 2 продолжает точечные исправления и документацию.
+- Production не запускался. Vercel project identity, deployed env/scopes/routes/headers, Telegram/Redis health и delivery не считаются подтверждёнными без отдельного read-only/deployed evidence.
 
-Do not route new work through old `feature/*`, `hoplite/*`, `codex/*`, `START-HERE`, `HANDOFF` or `CURRENT HANDOFF` pointers.
+## Runtime ownership
 
-## Executable application
+### Landing и data
 
-All runtime code is under `site/`.
+- `site/src/data.js` — locales, программы, группы, расписание, цены, тренеры, контакты и legal publication/consent state.
+- `site/src/locales.js`, `site/src/*-copy.js` — DE/RU/UK/TR copy.
+- `site/src/render.js`, `site/src/render-final.js`, `site/src/entry.js` — page/entry rendering.
+- `site/public/style.css`, `public/release-4.css`, `public/section-polish.css`, `public/pride.css` — visual layers; historical filename не означает отдельный Release 4 продукт.
+- `site/public/client.js`, `locale-entry.js`, `scroll-motion.js` — browser behavior and locale navigation.
 
-### Landing
+### Build и indexing
 
-- `site/src/data.js` — programs, groups, schedules, prices, trainers, contacts and legal state.
-- `site/src/locales.js` — DE/RU/UK/TR UI copy.
-- `site/src/*-copy.js` — specialized copy blocks.
-- `site/src/render.js` — landing markup/components.
-- `site/public/style.css` — visual system and responsive styling.
-- `site/public/client.js` — navigation, locale/theme behavior, forms and landing interactions.
-- `site/public/scroll-motion.js` — section reveal choreography.
-- `site/public/vendor/scrollcraft.*` — vendor motion runtime; do not edit for ordinary product changes.
+- `site/build.js` очищает `dist`, копирует assets, оценивает form readiness и indexing policy, строит локали/legal pages, `robots.txt`, условный `sitemap.xml` и `dist/ak-loewen-valset-release-6.html`.
+- `site/server/indexing-config.js` — единый policy helper: `INDEXING_ENABLED=true` недостаточен без production Vercel context и canonical HTTPS `PUBLIC_ORIGIN`; формирует `noindex` default, robots и sitemap.
+- `site/middleware.js` — root Vercel proxy entrypoint (`proxy.entrypoint`), использующий `next` из установленного `@vercel/functions`. Без matcher-исключений на каждом запросе сравнивает request origin с canonical origin и выдаёт `X-Robots-Tag`. Preview/noncanonical hosts, API/review paths и Telegram Privacy noindex; noncanonical sitemap не раскрывается.
+- `site/vercel.json` задаёт `proxy.entrypoint`, build/output (`npm run build`/`dist`) и security headers. Static duplicate `X-Robots-Tag` не используется.
 
-### Landing booking backend
+Indexable paths ограничены `/`, `/de/`, `/ru/`, `/uk/`, `/tr/` и их localized `impressum/`/`datenschutz/`. API, standalone review artifact и `/telegram-privacy/` не индексируются. Build-time flags требуют нового build/deployment; изменение env само по себе не переписывает уже созданный HTML.
+
+### Web form
 
 ```text
-browser form
+browser/no-JS form
   -> /api/trial-requests
-  -> site/api/trial-requests.js
   -> site/server/hosted-trial.js
-  -> Redis + Telegram delivery
+  -> validated same-provider Redis ledger + Telegram delivery
 ```
 
-- `site/server/validate-request.js` — authoritative request validation.
-- `site/src/trial-message.js` — lead message formatting.
-- `site/server/trial-requests.js` — local development delivery path.
-- `site/server/hosted-trial.js` — hosted idempotency/rate-limit/delivery path.
-- `site/api/trial-requests.js` — Vercel HTTP boundary.
+- `site/server/form-config.js` — redacted readiness; legal source, `FORM_PUBLICATION_STATUS`, exact `FORM_CONSENT_VERSION`, canonical origin, negative chat ID, token и complete same-provider Redis pair.
+- `site/api/trial-requests.js` — POST boundary; supplied Origin must exactly equal configured canonical origin, missing Origin remains allowed for no-JS semantics, Host не используется как fallback.
+- `site/server.js` — local server. Delivery requires form readiness plus explicit `LOCAL_FORM_DELIVERY_ENABLED=true`; inherited credentials alone do not send.
+- `site/server/hosted-trial.js` — validation, idempotency, rate limits and uncertain-delivery behavior; these semantics не заменяются документацией.
 
-### Telegram integration
+### Telegram
 
 ```text
 Telegram update
@@ -68,81 +65,32 @@ Telegram update
   -> site/server/bot-runtime.js
   -> site/server/telegram-bot.js
   -> site/server/bot-store.js
-  -> Redis aggregate / outbox
+  -> Redis aggregate/outbox
 
-Authenticated scheduler
-  -> site/api/telegram-worker.js
-  -> queued delivery / reminders
-  -> Telegram API
+explicit ops endpoint
+  -> site/api/telegram-ops.js
+  -> read-only Preview check (GETs to external transports only)
 ```
 
-- `site/server/telegram-bot.js` — client and staff conversation reducer.
-- `site/server/bot-runtime.js` — runtime/config boundary.
-- `site/server/bot-config.js` — configuration validation/readiness.
-- `site/server/bot-copy.js` — DE/RU/UK/TR Telegram copy.
-- `site/server/bot-store.js` — Redis/state/outbox logic.
-- `site/server/telegram-staff.js` — trainer-group membership validation support.
-- `site/api/telegram-webhook.js` — protected Telegram webhook endpoint.
-- `site/api/telegram-worker.js` — protected worker endpoint.
-- `site/api/telegram-link.js` — intentionally disabled bridge endpoint.
-- `site/public/telegram-privacy/index.html` — published Preview Privacy notice.
+- `server/bot-config.js` — bot flags, strict origin/privacy/readiness, auth mode and secret validation.
+- `server/telegram-bot.js` / `bot-copy.js` — client/staff reducers and DE/RU/UK/TR copy.
+- `server/telegram-contact.js` / `contact-copy.js` — separate lightweight customer/team conversation flow.
+- `server/telegram-staff.js` — current membership verification support.
+- `server/bot-store.js` — Redis state, deduplication, outbox and bounded history.
+- `api/telegram-webhook.js` — authenticated POST boundary; it is not a proof of deployed webhook configuration.
+- `api/telegram-worker.js` — future/disabled background capability; no scheduler required for ordinary booking/contact.
+- `server/telegram-ops.js` — release-6 Preview-only target gate, read-only check, and separately gated mutations. Target must be explicit canonical HTTPS and match Vercel branch/platform metadata; release-3 target is rejected.
+- `api/telegram-ops.js` — authenticated read-only remote check endpoint; no `setWebhook`, worker drain or delivery call from this endpoint.
+- `api/telegram-link.js` — intentionally disabled bridge capability.
 
-Current Telegram documentation is only under `docs/integrations/telegram/`.
+## API and deployment
 
-## Build / runtime
+- `site/vercel.json` — root is `site/`, build command `npm run build`, output `dist`, `trailingSlash: true`, Git deployment disabled, function budgets and middleware proxy.
+- `site/.env.example` — names and safe defaults only; never put values here.
+- `site/server.js` — local loopback runtime with noindex headers and local form safety gates.
 
-- `site/server.js` — local runtime.
-- `site/build.js` — generates localized site output and Release 3 standalone review artifact.
-- `site/vercel.json` — Vercel configuration.
-- `site/.env.example` — variable names only; never store real secrets.
+## Tests and documentation
 
-## Tests
+Tests live in `site/tests/`, including `telegram-*`, `bot-*`, form/config/indexing/ops tests and browser scripts. A historical pass does not prove a later revision. Current final test status belongs in the parent’s final release delivery, not in this architecture map.
 
-- `site/tests/*.test.js` — unit/integration tests used by `npm test`.
-- `site/tests/browser.mjs` — browser QA.
-- `site/tests/form-browser.mjs` — landing booking browser flow.
-- `site/tests/mobile-locales.mjs` — locale/mobile QA.
-- `site/tests/portrait-browser.mjs` — trainer portrait QA.
-- `site/tests/build-review.mjs` — standalone build review.
-- Telegram tests are named `telegram-*` and `bot-*` under the same `site/tests/` folder because Telegram is part of the same application.
-
-Historical release-specific scripts are stored in `archive/technical/`, not in the active test map.
-
-## Documentation
-
-- `docs/releases/RELEASE-2.md` — approved previous release.
-- `docs/releases/RELEASE-3.md` — current whole-project status.
-- `docs/integrations/telegram/` — Telegram setup/activation/verification inside Release 3.
-- `docs/legal/TELEGRAM-PRIVACY.md` — approved Telegram Privacy source.
-- `docs/project/` — product requirements.
-- `docs/development/README.md` — development entry point.
-
-## Archive
-
-Everything in `archive/` is historical/reference material. It must not override current code or Release 3 documentation.
-
-This includes old concepts, old handoff notes, previous verification reports, previous release names and screenshots/evidence.
-
-## Change routing
-
-- Landing factual data → `site/src/data.js`.
-- Landing copy → `site/src/locales.js` / specialized copy modules.
-- Landing structure → `site/src/render.js`.
-- Landing browser behavior → `site/public/client.js`.
-- Landing styles → `site/public/style.css`.
-- Website form delivery → `site/api/trial-requests.js` + `site/server/hosted-trial.js`.
-- Telegram dialogs/flow → `site/server/telegram-bot.js` + `site/server/bot-copy.js`.
-- Telegram persistence/delivery → `site/server/bot-store.js` + worker/webhook APIs.
-- Trainer authorization → `site/server/telegram-staff.js` and staff handling in `telegram-bot.js`.
-
-## End-of-work rule
-
-Do not create another handoff file.
-
-After a repository-changing task:
-
-1. update the relevant `docs/releases/RELEASE-N.md` status;
-2. update the relevant integration document if architecture/config changed;
-3. keep the release marked WIP/Preview/approved accurately;
-4. report actual checks only;
-5. never promote or deploy Production merely to simplify handoff.
+Change routing: data → `src/data.js`; copy → `src/locales.js`/specialized copy; render → `src/render*.js`; browser → `public/`; form → `api/trial-requests.js` + form/hosted services; Telegram → `server/telegram-*`, `bot-*`, `api/telegram-*`; indexing → `server/indexing-config.js`, `middleware.js`, `build.js`.

@@ -1,1 +1,29 @@
-{"name":"ak-loewen-valset","version":"1.0.0","private":true,"type":"module","engines":{"node":">=24"},"scripts":{"dev":"node server.js","start":"node server.js","build":"node build.js","test":"node --test tests/*.test.js","verify":"node tests/browser.mjs","telegram:ops":"node server/telegram-ops.js","lint":"eslint src server api public/client.js public/locale-entry.js server.js build.js tests"},"devDependencies":{"@eslint/js":"^10.0.1","eslint":"^10.10.0","globals":"^17.12.0","playwright-core":"^1.55.0","sharp":"^0.35.4"},"dependencies":{"@upstash/redis":"^1.38.4","@vercel/functions":"^3.9.7"}}
+{
+  "name": "ak-loewen-valset",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "build": "node build.js",
+    "test": "node --test tests/*.test.js",
+    "verify": "node tests/browser.mjs",
+    "telegram:ops": "node server/telegram-ops.js",
+    "lint": "eslint src server api public/client.js public/locale-entry.js server.js build.js tests middleware.js"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.10.0",
+    "globals": "^17.12.0",
+    "playwright-core": "^1.55.0",
+    "sharp": "^0.35.4"
+  },
+  "dependencies": {
+    "@upstash/redis": "^1.38.4",
+    "@vercel/functions": "^3.9.7"
+  }
+}

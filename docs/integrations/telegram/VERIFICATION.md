@@ -1,33 +1,10 @@
-# AK LÖWEN Release 3 — Telegram verification
+# Telegram verification — AK-LOEWEN Release 6
 
-Telegram проверяется как часть единого Release 3.
+Этот документ разделяет локальные доказательства, read-only cloud inspection и реальную delivery verification. Обновление документа само по себе не запускало tests, Telegram, Redis, Vercel или webhook.
 
-## Исторические результаты
+## Что проверять локально
 
-До текущей доработки выполнялись Telegram unit/API/Redis проверки, lint и build. Они полезны как история, но не подтверждают текущий Release 3. Старый полный отчёт: `../../../archive/technical/telegram-verification-2026-09-14.md`.
-
-Исторически фиксировались:
-
-- targeted Telegram tests: 19 passed / 0 failed;
-- local Redis integration: 1 passed / 0 failed;
-- full suite: 37 passed / 2 pre-existing baseline failures;
-- lint: passed;
-- build: passed после восстановления binary assets.
-
-## Текущая проверка 2026-09-15 — не финальная
-
-- Прочитаны пять текущих документов, код исследован только из `release-3`.
-- Через Telegram API подтверждён существующий `@ak_loewenbot`.
-- `getWebhookInfo`: URL совпадает с `https://ak-loewen-bot-preview.vercel.app/api/telegram-webhook/`, pending updates = 0, last error отсутствует. Это снимок доставки, НЕ подтверждение обработки реальной заявки.
-- Vercel Preview alias обслуживает `release-3`. Release 2/Production, runtime secrets и Redis data не изменялись.
-- Проверено наличие и scope env без расшифровки значений. Bot Token и Redis aliases существуют; часть bot env ещё не применима к `release-3`, Privacy runtime configuration неполная. Детали и project identity — в `SETUP.md`.
-- Staff membership подключена в runtime/handler. Добавлен `site/tests/telegram-staff-flow.test.js`: fail-closed default, allowlist + group + membership, отказ при удалении сотрудника/ошибке API, перепроверка на этапах даты/commit, durable callback ACK без расходования действия при отказе, duplicate handling, runtime injection. Существующие успешные staff unit fixtures явно используют fake verifier.
-- Webhook function budget увеличен до 30 секунд: прежние 10 секунд могли быть короче bounded drain даже до добавления membership preflight.
-- После текущей доработки локально: `npm test` — 152 теста, 151 passed, 0 failed, 1 skipped; `npm run lint` и `npm run build` проходят. Единственный skip — Redis-интеграция без установленного `redis-server`; scheduler, Redis runtime health и реальный E2E ещё НЕ проверены. Статус остаётся WIP / Preview.
-
-## Финальная проверка Release 3
-
-После group binding, staff integration, runtime и scheduler setup:
+На конкретном candidate SHA, после изменений:
 
 ```sh
 cd site
@@ -37,16 +14,51 @@ npm run lint
 npm run build
 ```
 
-Затем проверить связанный flow AK LÖWEN:
+Для browser QA использовать свежий локальный build/server и безопасные mocks. Telegram unit/integration tests проверяют reducer, idempotency, staff authorization, Redis behavior и error paths; они не доказывают cloud webhook или успешную доставку.
 
-1. клиент открывает/использует процесс записи;
-2. Telegram `/start` и выбор языка;
-3. booking с Privacy consent;
-4. заявка поступает в утверждённую trainer group;
-5. staff authorization;
-6. confirm/reschedule/cancel;
-7. клиентский `/status`;
-8. reminder opt-in/opt-out и двухчасовой reminder;
-9. отказ доступа неавторизованному пользователю.
+## Read-only cloud checks
 
-Только результаты после финальной конфигурации считаются верификацией Release 3.
+Разрешённый read-only Vercel audit должен подтвердить только metadata:
+
+- exact project identity, root `site`, build/output, Node >=24;
+- branch/deployment settings;
+- env names, types and scopes/targets, без values;
+- deployed route/header behavior, если доступно безопасное GET/HEAD inspection.
+
+Пока это не подтверждено отдельным evidence, status остаётся **UNVERIFIED**. Старый Release 3 snapshot и наличие Doppler/Vercel connection не являются проверкой project, env credentials или runtime health.
+
+## Target gates
+
+Release-6 `telegram-ops` read-only check должен fail closed, если не выполнены все target conditions:
+
+- Vercel Preview (`VERCEL=1`, `VERCEL_ENV=preview`);
+- exact branch `release-6`;
+- canonical HTTPS `TELEGRAM_OPS_PREVIEW_ORIGIN`;
+- equality with canonical `PUBLIC_ORIGIN` and platform-derived `VERCEL_URL`/`VERCEL_BRANCH_URL`;
+- expected bot identity, privacy publication/version and `/api/telegram-webhook/` path.
+
+Только после прохождения local gate check может выполнять read-only GET-like transport checks. Он не вызывает `setWebhook`, worker drain или delivery.
+
+## Deployed smoke (только по отдельному разрешению)
+
+Согласованный controlled smoke должен отдельно фиксировать:
+
+1. target и candidate SHA;
+2. canonical route/slash behavior и security/indexing headers;
+3. legal/privacy pages и consent version;
+4. web form validation/idempotency/uncertain behavior, если form smoke разрешён;
+5. Telegram `/start`, booking/contact, staff authorization, reply/close/status, если real Telegram smoke разрешён;
+6. webhook status, Redis state and rollback observation.
+
+Не отправлять реальные заявки или Telegram-сообщения без explicit permission. Смена webhook текущего бота влияет на реальных пользователей и требует отдельного разрешения, наблюдения и rollback.
+
+## Не выдавать за verification
+
+- старые Release 2/3 результаты;
+- локальный mock или screenshot;
+- наличие env name/value в scope;
+- READY deployment без подтверждения Git source/target;
+- `vercel.json` как доказательство фактического deployed route/header;
+- read-only check как доказательство успешной delivery.
+
+Финальный verification status, список команд и остаточные blockers должен записать parent в release delivery после фактических проверок. Секреты и raw responses не сохранять.

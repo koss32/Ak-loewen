@@ -2,9 +2,14 @@ import {execFileSync} from 'node:child_process';
 import {readFileSync,readdirSync} from 'node:fs';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
+import {legal} from '../src/data.js';
 
+// This is a static build fixture only: never inherit project credentials.
+const safeEnv={PATH:process.env.PATH,HOME:process.env.HOME,TMPDIR:process.env.TMPDIR};
+const liveFixture={...safeEnv,FORM_DELIVERY_ENABLED:'true',FORM_PUBLICATION_STATUS:'published',FORM_CONSENT_VERSION:legal.consentVersion,PUBLIC_ORIGIN:'https://build-fixture.invalid',TELEGRAM_BOT_TOKEN:'build-fixture-not-a-real-token',TELEGRAM_CHAT_ID_AK:'-123456',UPSTASH_REDIS_REST_URL:'https://redis-fixture.invalid',UPSTASH_REDIS_REST_TOKEN:'fixture-only'};
 try {
- execFileSync(process.execPath,['build.js'],{env:{...process.env,FORM_DELIVERY_ENABLED:'true'}});
+ execFileSync(process.execPath,['build.js'],{env:liveFixture});
+ assert.match(readFileSync('dist/de/index.html','utf8'),/data-live="true"/);
  const standalone=readdirSync('dist').find(name=>/^ak-loewen-valset-.*\.html$/.test(name));
  assert.ok(standalone,'standalone build artifact exists');
  const html=readFileSync(`dist/${standalone}`,'utf8');
@@ -23,5 +28,5 @@ try {
  assert.doesNotMatch(head,/(?:src|srcset)="\/assets\//);
  console.log('PASS: standalone build embeds trainer assets and keeps every locale in demo mode.');
 } finally {
- execFileSync(process.execPath,['build.js'],{env:{...process.env,FORM_DELIVERY_ENABLED:'false'}});
+ execFileSync(process.execPath,['build.js'],{env:{...safeEnv,FORM_DELIVERY_ENABLED:'false'}});
 }

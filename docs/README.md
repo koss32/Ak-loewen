@@ -1,32 +1,26 @@
-# Документация AK LÖWEN
+# Документация AK-LOEWEN
 
-> **Текущая точка входа — [Release 6](releases/RELEASE-6.md) и [инструкция следующему агенту](releases/RELEASE-6-CONTINUATION.md).** Phase 2 ещё не завершена. Ниже сохранён прежний индекс; его полная актуализация остаётся в TASK 6.
+Документация относится к одному приложению **AK-LOEWEN**: лендинг, web booking/API и Telegram-интеграция.
 
-Документация относится к одному проекту **AK LÖWEN**: лендинг + связанные интеграции.
+## Текущая точка
 
-## Релизы всего проекта
+- [`releases/RELEASE-6.md`](releases/RELEASE-6.md) — актуальный status record.
+- [`releases/RELEASE-6-CONTINUATION.md`](releases/RELEASE-6-CONTINUATION.md) — фактическая передача, ограничения, проверки и cloud blockers.
+- [`releases/RELEASE-6-LAUNCH-CHECKLIST.md`](releases/RELEASE-6-LAUNCH-CHECKLIST.md) — простой safety-порядок будущего запуска; не разрешение и не доказательство deployed readiness.
+- [`releases/release-6-evidence/`](releases/release-6-evidence/) — датированные evidence и inventory; исторические результаты не заменяют новый аудит.
 
-- `releases/RELEASE-2.md` — утверждённый лендинг.
-- `releases/RELEASE-3.md` — текущая версия: лендинг + Telegram-интеграция, WIP / Preview.
+Release 6: **локальная подготовка проверена; Production не запускался**. Точный Vercel project уже установлен read-only (`ak-loewen-release-a`), но release-6 deployment, production env/scopes, routes/headers, Redis, Telegram webhook/membership/delivery не подтверждены.
 
-Никаких отдельных «версий Telegram» или «версий handoff» нет.
+## Релизы и разделы
 
-## Интеграции
+- [`releases/RELEASE-2.md`](releases/RELEASE-2.md) — исторический baseline.
+- [`releases/RELEASE-3.md`](releases/RELEASE-3.md) — исторический Preview/WIP, не source of truth.
+- [`integrations/telegram/README.md`](integrations/telegram/README.md) — роль, архитектура и safety defaults.
+- [`integrations/telegram/SETUP.md`](integrations/telegram/SETUP.md) — конфигурация без секретов.
+- [`integrations/telegram/ACTIVATION.md`](integrations/telegram/ACTIVATION.md) — будущая активация с отдельными разрешениями.
+- [`integrations/telegram/VERIFICATION.md`](integrations/telegram/VERIFICATION.md) — проверки и unverified items.
+- [`architecture/AI-MAP.md`](architecture/AI-MAP.md) — ownership.
+- [`development/README.md`](development/README.md) — Node 24, build и local QA.
+- [`legal/TELEGRAM-PRIVACY.md`](legal/TELEGRAM-PRIVACY.md) — legal source.
 
-### Telegram
-
-- `integrations/telegram/README.md` — роль Telegram в проекте и текущий статус.
-- `integrations/telegram/SETUP.md` — Preview-конфигурация.
-- `integrations/telegram/ACTIVATION.md` — порядок активации.
-- `integrations/telegram/VERIFICATION.md` — проверки.
-- `integrations/telegram/PREVIEW-SNAPSHOT-2026-09-15.json` — исторический снимок состояния Preview; не текущий source of truth.
-
-## Остальная документация
-
-- `development/README.md` — запуск/build и рабочая структура.
-- `architecture/AI-MAP.md` — карта модулей.
-- `project/BRIEF.md` — продуктовый brief.
-- `project/PARENT-EXPERIENCE.md` — требования к UX родителей.
-- `legal/TELEGRAM-PRIVACY.md` — утверждённый Privacy source для Telegram-интеграции.
-
-История и старые handoff/verification/concept материалы находятся в `archive/`.
+`archive/` и старые Release 2/3 материалы исторические. Не использовать их для разрешения Production, изменения legal facts или cloud configuration.

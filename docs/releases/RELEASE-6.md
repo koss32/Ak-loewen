@@ -1,48 +1,51 @@
-# Release 6 — промежуточная передача
+# Release 6 — текущий статус
 
-Статус на 18.09.2026: **Phase 1 завершена и одобрена; Phase 2 начата, но НЕ завершена. Production не запускался.** По просьбе владельца дальнейшая разработка остановлена для передачи следующему агенту Astra 6.
+**Дата обновления:** 18.09.2026. **Состояние:** подготовка Preview завершена по локальной ревизии; Production не запускался.
 
-- Проект: `koss32/Ak-loewen`.
-- Стабильная ветка: `release-5`, неизменяемый baseline `c52e77dcde8548e00f2e6208b143dc87c37f811e`.
-- Рабочая ветка: `release-6`.
-- Завершённая Phase 1: `f82f9e6b38a8ddc1e652566bfb6fe2d28159e294`.
-- Текущая промежуточная версия: commit, содержащий этот файл; точный SHA также указан в сообщении передачи и `DELIVERY.json` внешнего архива.
+- Проект: `koss32/Ak-loewen`, рабочая ветка: `release-6`.
+- Проверенный кандидат в этой рабочей копии: `f5c3660407a6bae1d66d5c3ea662fe5c119c5ea4`.
+- Стабильная ветка `release-5` не изменяется: `c52e77dcde8548e00f2e6208b143dc87c37f811e`.
+- Финальный remote SHA для доставки должен быть записан после push в `DELIVERY.json`; здесь не выдумывается SHA, которого ещё нет в remote.
 
-## Продолжение
+## Что сделано
 
-**Начать с [RELEASE-6-CONTINUATION.md](RELEASE-6-CONTINUATION.md).** Это специально запрошенная владельцем инструкция для следующего агента: ограничения, проверенное состояние, оставшиеся TASK 5–8, порядок выполнения и границы тестовых доказательств.
+В Release 6 сохранены booking и web form, Telegram booking/status/contact со staff authorization и Redis-backed contact relay, локали DE/RU/UK/TR и утверждённая визуальная база. Worker/reminders остаются **DISABLED / FUTURE CAPABILITY** и не требуются для базовых booking/contact flows.
 
-## Завершено
+В текущем кандидате завершены точечные исправления Phase 2:
 
-Phase 1: Telegram main menu с booking/contact; Redis-backed многосообщенчатый contact relay с Reply/Close и текущей staff authorization; существующий booking/web form сохранён; Telegram CTA исправлены; reminders/worker disabled по умолчанию без удаления архитектуры; DE/RU/UK/TR.
+- единая строгая нормализация HTTPS `PUBLIC_ORIGIN`;
+- отдельные legal/publication и env readiness gates формы, без подмены их Telegram privacy policy;
+- полная same-provider Redis URL/token pair;
+- два явных opt-in флага локальной form delivery;
+- Preview target для Release 6 в Telegram ops и отдельный mutation gate;
+- production-only indexing с default OFF; Preview, local, noncanonical и служебные маршруты остаются `noindex, nofollow`;
+- переносимый browser launcher и актуальные browser assertions.
 
-В начатой Phase 2 изменены только browser-тесты: переносимый запуск Chromium, актуализация устаревших ожиданий формы и поиска standalone artifact. Runtime/frontend-дизайн, API, Vercel-конфигурация и env в Phase 2 ещё не исправлялись. Документы передачи добавлены отдельно, не означают завершение TASK 6/8.
+Секреты и реальные значения env в документацию не записывались.
 
-## Реально выполненные проверки
+## Проверки текущего кандидата
 
-| Проверка | Результат и область |
-| --- | --- |
-| Phase 1 `npm ci` | Успешно |
-| Phase 1 `npm test` | 189 passed, 0 failed, 0 skipped; включая локальный Redis CAS/restart |
-| Phase 1 `npm run lint` | Успешно на Phase 1 |
-| Phase 1 `npm run build` | Успешно на Phase 1 |
-| Phase 2 подготовка `npm ci` | Успешно; зависимости не менялись |
-| Phase 2 `npm test` | 189/189 passed; лог в архиве передачи |
-| Phase 2 browser/form-browser/mobile-locales/portrait-browser/outcomes/build-review | Все шесть скриптов успешно выполнены локально; подробности в [browser-report.md](release-6-evidence/browser-report.md) |
-| Phase 2 `npm run build` для browser QA | Успешно; runtime/build-код остался Phase 1 |
-| Phase 2 `npm run lint` после изменений `.mjs` | **Не запускался**; не переносить статус Phase 1 lint на эти изменения |
-| Проверка deployed Vercel/Telegram/Redis | **Не выполнялась** |
+- `npm ci` — exit 0.
+- `npm test` — **207 passed, 0 failed, 0 skipped**, включая локальный Redis; семь phase-2 indexing tests.
+- `npm run lint` — exit 0.
+- `npm run build` — exit 0.
+- Шесть browser scripts и `phase2-accessibility.mjs` — успешно локально с mocks; реальная доставка не выполнялась.
+- RU/UK/TR montage просмотрен: явного clipping не обнаружено. Это не полный accessibility/device audit.
 
-Успешные проверки на неизменённом коде не нужно повторять только ради передачи. После дальнейших изменений нужны затронутые регрессии и финальные команды TASK 7.
+Исторические отчёты и подробности предыдущего прогона: [continuation](RELEASE-6-CONTINUATION.md), [runtime audit](release-6-evidence/runtime-audit.md), [browser report](release-6-evidence/browser-report.md). Старые цифры Phase 1/Phase 2 в них сохраняются как исторические и не заменяют результаты выше.
 
-## Не завершено
+## Cloud и Production: что пока заблокировано
 
-TASK 5: реальные настройки Vercel/env scopes/API/Redis/webhook не проверены. Создано подключение Vercel, но рабочий API-доступ ещё не одобрен и не использован.
+Read-only аудит точно установил Vercel project:
 
-TASK 6: найдены устаревшие ops guards и docs/branding/reference pointers; не реализован безопасный indexing switch; нужны точечные проверки Origin/privacy/form readiness/local delivery guards.
+- team `zumeeeeer-6684's projects`, ID `team_j4dElwkGk5L6ODyrhxQRW1N5`;
+- project `ak-loewen-release-a`, ID `prj_0kG9RBjUgIn4UktNF1qYU0cCgRvU`;
+- GitHub link `koss32/Ak-loewen`.
 
-TASK 7: локальное browser QA пройдено; полного финального прогона после будущих исправлений ещё нет. Реальные deployed проверки остаются отдельными.
+Сверенные настройки: root `site`, build `npm run build`, output `dist`, Node `24.x`. Remote production branch — `Ak-loewen`, не `release-6`; metadata auto-deployment (`createDeployments=enabled`) расходится с checked-in `site/vercel.json` (`git.deploymentEnabled=false`). Среди 20 просмотренных deployment records подтверждённого deployment из `release-6` нет; последний exact detail — `ERROR`, ref `ksyusha`, SHA `731ebcfdfae96bf371e70d061c9903ddf9664cb`.
 
-TASK 8: промежуточная передача не является финализацией. Финальный `RELEASE-6-LAUNCH-CHECKLIST.md` намеренно **не создан**, чтобы не выдавать незавершённую readiness за готовность к запуску.
+В env metadata найдено 34 записи: все target `preview`, старые scopes `release-3`/feature и без branch; Production и `release-6` scope не подтверждены. Наличие env name не доказывает валидность credentials. Deployed routes/headers, Redis, Telegram membership, webhook, form delivery, aliases и indexing не проверялись и не изменялись.
 
-Аудит по коду: [runtime-audit.md](release-6-evidence/runtime-audit.md). Это список наблюдений и кандидатов на исправление, а не доказательство deployed-состояния.
+## Следующий шаг
+
+Этот документ — release status, не разрешение на запуск. При будущей отдельной команде владельца использовать [RELEASE-6-LAUNCH-CHECKLIST.md](RELEASE-6-LAUNCH-CHECKLIST.md): сначала подтвердить candidate SHA и cloud target, затем controlled smoke с отдельными разрешениями; indexing включать последним. До этого Production, webhook, delivery, aliases и indexing остаются выключенными.

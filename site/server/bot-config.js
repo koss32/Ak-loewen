@@ -1,4 +1,5 @@
 import {legal} from '../src/data.js';
+import {normalizePublicOrigin} from './site-config.js';
 
 const flag=(env,name)=>env[name]==='true';
 const text=value=>typeof value==='string'?value.trim():'';
@@ -17,14 +18,14 @@ export function parseStaffUserIds(value){
 /** Staff routing is group-only in both authorization modes; private IDs are unsafe. */
 export function validStaffChatId(value){const raw=text(value),id=Number(raw);return /^-[1-9]\d*$/.test(raw)&&Number.isSafeInteger(id)&&id<0&&String(id)===raw;}
 
-/** PUBLIC_ORIGIN is an origin, not a URL prefix. A single trailing slash is harmless. */
+/**
+ * Compatibility wrapper for existing bot callers/tests. The shared normalizer
+ * is authoritative and returns the canonical string; bot development keeps its
+ * intentional loopback support by opting in explicitly here.
+ */
 export function validPublicOrigin(value){
- try{
-  const raw=text(value),url=new URL(raw);
-  if(!raw||url.username||url.password||url.search||url.hash||url.pathname!=='/')return null;
-  if(url.protocol==='https:')return url;
-  return url.protocol==='http:'&&['localhost','127.0.0.1','[::1]'].includes(url.hostname)?url:null;
- }catch{return null;}
+ const origin=normalizePublicOrigin(value,{allowLoopback:true});
+ return origin?new URL(origin):null;
 }
 
 export function validPrivacyUrl(value){

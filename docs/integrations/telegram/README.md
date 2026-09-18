@@ -1,38 +1,67 @@
-# Telegram integration — AK LÖWEN Release 3
+# Telegram integration — AK-LOEWEN Release 6
 
-Telegram-бот является частью приложения AK LÖWEN и связан с его процессом записи. Это не отдельный продукт и не отдельная линия релизов.
+Telegram — интеграция единого приложения AK-LOEWEN, не отдельный продукт и не отдельная версия.
 
-## Роль интеграции
+## Роль
 
-Telegram обеспечивает клиентский booking/status flow и staff-обработку заявок, связанных с AK LÖWEN.
+Интеграция поддерживает:
+
+- клиентский `/start`, выбор языка и booking/status flow;
+- связь клиента с командой через отдельный ticket/conversation flow;
+- staff actions для заявок и текущую проверку авторизации/membership;
+- Redis-backed idempotency, state и bounded outbox.
+
+Основной web booking остаётся отдельным web flow. Telegram не является обязательным условием для статической landing страницы.
 
 ## Текущий статус
 
-**Release 3 / WIP / Preview. Production не активирован.**
+**Release 6 / WIP / Preview preparation. Production не активирован.**
 
-Готово:
+Phase 1 сохранена как завершённая в release evidence. Phase 2 продолжает точечные safety/config/indexing и documentation changes. Реальные Vercel project/env scopes, deployed routes/headers, Redis health, Telegram membership, webhook и delivery остаются отдельными непроверенными пунктами до финальной передачи.
 
-- DE/RU/UK/TR, немецкий по умолчанию;
-- кнопочная навигация и FAQ;
-- booking/status/cancel/staff flow;
-- Redis/outbox;
-- защищённые webhook/worker endpoints;
-- Preview Privacy notice;
-- модуль проверки членства staff в trainer group подключён к runtime и handler; локальные regression tests выполнены в составе полного набора.
-- В исходном коде `release-3` тренер выбирает подходящую регулярную тренировку кнопкой из расписания той группы, на которую поступила заявка. Бот рассчитывает ближайшее начало в `Europe/Berlin`; это время используется для подтверждения, статуса клиента и opt-in напоминания за два часа.
-- Тренер может отправить клиенту свободный текст через бота. При отклонении текст причины подтверждается перед доставкой, а заявка переводится в отменённый статус.
-- Бот присваивает новым заявкам последовательные номера с `1`. Контакт для заявки — Telegram (`@username` или `t.me/username`) либо номер телефона; имя участника собирается отдельным полем.
-- После валидного клика inline-кнопки следующий экран появляется сразу, а устаревшая карточка бота удаляется через 2,5 секунды, поэтому предыдущие меню не накапливаются. Сообщения пользователя и важные ответы тренера не удаляются автоматически.
-- Предпросмотр ссылки отключён в запросе Telegram-контакта. Выбор «взрослый/несовершеннолетний» фильтруется по возрастному диапазону выбранной группы.
-- Удаление старой карточки задерживается на 2,5 секунды и выполняется в фоне, поэтому новая карточка открывается без паузы.
+Без отдельной команды владельца запрещены:
 
-Осталось:
+- Production deployment/alias или изменение Production env;
+- смена Telegram webhook или отправка реальной заявки/message;
+- Redis mutation/worker drain;
+- включение worker/reminders/scheduler;
+- включение indexing.
 
-1. привязать Release-3 Preview к актуальному Telegram ID trainer supergroup после миграции;
-2. проверить подключённую membership validation реальным staff flow;
-3. сверить и включить существующий authenticated minute worker trigger только после E2E;
-4. завершить Preview runtime configuration и deployment;
-5. выполнить реальный end-to-end Preview flow.
-6. после следующего Preview deployment проверить реальными Telegram updates выбор тренировки, персональный ответ и персональный отказ.
+## Архитектура
 
-Документы: `SETUP.md`, `ACTIVATION.md`, `VERIFICATION.md`.
+```text
+Telegram update
+  -> /api/telegram-webhook/
+  -> bot-runtime + telegram-bot/contact reducers
+  -> Redis state/dedup/outbox
+  -> Telegram response
+```
+
+`/api/telegram-ops/` — отдельная authenticated read-only Preview check surface. Она не разрешает `setWebhook`, worker drain или delivery. Mutation commands в `server/telegram-ops.js` имеют отдельные gates, включая `TELEGRAM_OPS_MUTATIONS_ENABLED=true`, и не допускаются в Production.
+
+Worker/reminders остаются disabled/future capability. Обычные booking/contact flows не должны зависеть от scheduler.
+
+## Конфигурационная политика
+
+Основные переменные и безопасные defaults находятся в `site/.env.example`. В частности:
+
+- `BOT_ENABLED`, `BOT_WEBHOOK_ENABLED`, `BOT_WORKER_ENABLED` — явные flags;
+- `TELEGRAM_BOT_TOKEN`, secrets и Redis credentials — server-only, в документацию не копируются;
+- `TELEGRAM_STAFF_AUTH_MODE=allowlist` или `group_members` — staff chat должен быть отрицательной group/supergroup ID;
+- `PUBLIC_ORIGIN` — canonical HTTPS root без path/query/credentials;
+- `PRIVACY_URL`, `PRIVACY_PUBLICATION_STATUS`, `PRIVACY_CONSENT_VERSION` — отдельная Telegram privacy readiness;
+- `TELEGRAM_OPS_PREVIEW_ORIGIN` — explicit canonical HTTPS Release-6 Preview target, а не произвольный allow-host;
+- `TELEGRAM_OPS_MUTATIONS_ENABLED=false` — default off;
+- `BOT_WORKER_ENABLED=false`, `BOT_REMINDERS_ENABLED=false` — disabled/future.
+
+Telegram privacy readiness не подменяет web-form legal readiness: web form использует собственные `FORM_PUBLICATION_STATUS` и `FORM_CONSENT_VERSION`, согласованные с текущим legal source.
+
+## Документы
+
+- [`SETUP.md`](SETUP.md) — безопасная конфигурация без секретов.
+- [`ACTIVATION.md`](ACTIVATION.md) — будущий порядок активации с отдельными разрешениями.
+- [`VERIFICATION.md`](VERIFICATION.md) — проверки и границы доказательств.
+- [`../../releases/RELEASE-6-LAUNCH-CHECKLIST.md`](../../releases/RELEASE-6-LAUNCH-CHECKLIST.md) — общий launch order; сам не разрешает launch.
+- [`../../legal/TELEGRAM-PRIVACY.md`](../../legal/TELEGRAM-PRIVACY.md) — approved legal source.
+
+Исторический `PREVIEW-SNAPSHOT-2026-09-15.json` не является текущей конфигурацией.

@@ -10,7 +10,7 @@ export async function launchChromium(options={}) {
  try {
   await access(executablePath);
  } catch {
-  throw new Error(`Chromium was not found at ${executablePath}. Install the project's Playwright Chromium revision (for example: npx playwright@1.55.0 install chromium), or set PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH.`);
+  throw new Error(`Chromium was not found at ${executablePath}. Install the project's Playwright Chromium revision (for example: node node_modules/playwright-core/cli.js install chromium), or set PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH.`);
  }
  return chromium.launch({executablePath,...options});
 }

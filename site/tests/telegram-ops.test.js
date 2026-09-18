@@ -1,16 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {runCheck,runWebhook,runWorker,runTelegramOps,PREVIEW_ORIGIN} from '../server/telegram-ops.js';
+import {runCheck,runWebhook,runWorker,runTelegramOps} from '../server/telegram-ops.js';
 import {spawnSync} from 'node:child_process';
 
-const TOKEN='t'.repeat(40),WEBHOOK_SECRET='h'.repeat(40),WORKER_SECRET='w'.repeat(40);
+const TOKEN='t'.repeat(40),WEBHOOK_SECRET='h'.repeat(40),WORKER_SECRET='w'.repeat(40),OPS_ORIGIN='https://release-6-preview.example';
 const baseEnv=()=>({
- VERCEL:'1',VERCEL_ENV:'preview',VERCEL_GIT_COMMIT_REF:'release-3',PUBLIC_ORIGIN:PREVIEW_ORIGIN,
+ VERCEL:'1',VERCEL_ENV:'preview',VERCEL_GIT_COMMIT_REF:'release-6',VERCEL_URL:'release-6-preview.example',
+ TELEGRAM_OPS_PREVIEW_ORIGIN:OPS_ORIGIN,PUBLIC_ORIGIN:`${OPS_ORIGIN}/`,
  BOT_ENABLED:'true',BOT_WEBHOOK_ENABLED:'true',BOT_WORKER_ENABLED:'true',
  TELEGRAM_BOT_TOKEN:TOKEN,TELEGRAM_BOT_USERNAME:'ak_loewenbot',TELEGRAM_STAFF_USER_IDS:'55,56',TELEGRAM_STAFF_CHAT_ID:'-10099',
  TELEGRAM_WEBHOOK_SECRET:WEBHOOK_SECRET,TELEGRAM_WORKER_SECRET:WORKER_SECRET,
  UPSTASH_REDIS_REST_URL:'https://redis.example',UPSTASH_REDIS_REST_TOKEN:'redis-token',BOT_REDIS_PREFIX:'{akbot}:',
- PRIVACY_PUBLICATION_STATUS:'published',PRIVACY_CONSENT_VERSION:'telegram-2026-09-15-v1',PRIVACY_URL:`${PREVIEW_ORIGIN}/telegram-privacy/`,FORM_DELIVERY_ENABLED:'false'
+ PRIVACY_PUBLICATION_STATUS:'published',PRIVACY_CONSENT_VERSION:'telegram-2026-09-15-v1',PRIVACY_URL:`${OPS_ORIGIN}/telegram-privacy/`,FORM_DELIVERY_ENABLED:'false',TELEGRAM_OPS_MUTATIONS_ENABLED:'true'
 });
 function state(){return JSON.stringify({schema:2,sessions:{},requests:{},clients:{},updates:{},actions:{},outbox:{},recipientSequence:{},recipientBlockedUntil:{}});}
 function fakeFetch({setResult=true,botUsername='ak_loewenbot',botIdentity,stateBody=state(),calls=[]}={}){return async(url,options={})=>{
@@ -18,14 +19,38 @@ function fakeFetch({setResult=true,botUsername='ak_loewenbot',botIdentity,stateB
  if(url.includes('/ping'))return {status:200,json:async()=>({result:'PONG'})};
  if(url.includes('/get/'))return {status:200,json:async()=>({result:stateBody})};
  if(url.includes('/getMe'))return {status:200,json:async()=>({ok:true,result:botIdentity||{id:999,username:botUsername,is_bot:true}})};
- if(url.includes('/getWebhookInfo'))return {status:200,json:async()=>({ok:true,result:{url:`${PREVIEW_ORIGIN}/api/telegram-webhook/`,pending_update_count:0,last_error_message:''}})};
+ if(url.includes('/getWebhookInfo'))return {status:200,json:async()=>({ok:true,result:{url:`${OPS_ORIGIN}/api/telegram-webhook/`,pending_update_count:0,last_error_message:''}})};
  if(url.includes('/getChatMember')){const body=JSON.parse(options.body);return {status:200,json:async()=>({ok:true,result:{status:Number(body.user_id)===999?'administrator':'member',user:{id:Number(body.user_id),is_bot:Number(body.user_id)===999}}})};}
  if(url.includes('/getChat'))return {status:200,json:async()=>({ok:true,result:{id:-10099,type:'supergroup'}})};
  if(url.includes('/setWebhook'))return {status:200,json:async()=>({ok:true,result:setResult})};
  throw new Error('unexpected request');
 };}
 
- test('check is read-only, aggregates safe schema state, and never returns secrets or identifiers',async()=>{
+ test('ops target defaults to deny and rejects the retired release-3 target',async()=>{
+ for(const env of [
+  {},
+  {...baseEnv(),VERCEL_GIT_COMMIT_REF:'release-3'},
+  {...baseEnv(),TELEGRAM_OPS_PREVIEW_ORIGIN:''},
+  {...baseEnv(),TELEGRAM_OPS_PREVIEW_ORIGIN:'https://release-6-preview.example/'},
+  {...baseEnv(),PUBLIC_ORIGIN:'https://other.example'},
+  {...baseEnv(),TELEGRAM_OPS_PREVIEW_ORIGIN:'http://release-6-preview.example'},
+  {...baseEnv(),VERCEL_URL:'other.example',VERCEL_BRANCH_URL:''},
+  {...baseEnv(),VERCEL_URL:'',VERCEL_BRANCH_URL:''},
+  {...baseEnv(),VERCEL_GIT_COMMIT_REF:''},
+  {...baseEnv(),VERCEL_GIT_COMMIT_REF:'main'}
+ ]){
+  const calls=[],result=await runCheck({env,fetchImpl:fakeFetch({calls})});
+  assert.equal(result.ok,false);assert.equal(result.booking_ready,false);assert.ok(result.errors.includes('CHECK_PRECONDITION_FAILED'));assert.equal(calls.length,0);
+ }
+});
+
+test('release-6 target matches the verified platform host and check remains read-only',async()=>{
+ const calls=[],result=await runCheck({env:baseEnv(),fetchImpl:fakeFetch({calls})});
+ assert.equal(result.ok,true);assert.equal(result.preconditions.source_branch,true);assert.equal(result.preconditions.deployment_origin,true);
+ assert.equal(calls.some(x=>x.url.includes('/setWebhook')||x.url.includes('/sendMessage')||x.url.includes('/del')),false);
+});
+
+test('check is read-only, aggregates safe schema state, and never returns secrets or identifiers',async()=>{
  const calls=[],result=await runCheck({env:baseEnv(),fetchImpl:fakeFetch({calls})});
  assert.equal(result.ok,true);
  assert.equal(result.booking_ready,true);
@@ -62,6 +87,14 @@ test('webhook refuses production and wrong-branch mutation preconditions',async(
  for(const change of [{VERCEL_ENV:'production'},{VERCEL_GIT_COMMIT_REF:'main'},{PUBLIC_ORIGIN:'https://other.example'}]){
   const calls=[],result=await runWebhook({env:{...baseEnv(),...change},fetchImpl:fakeFetch({calls})});
   assert.equal(result.ok,false);assert.equal(result.mutated,false);assert.equal(result.code,'MUTATION_PRECONDITION_FAILED');assert.equal(calls.length,0);
+ }
+});
+
+test('mutations require the separate explicit ops gate and stay denied by default',async()=>{
+ for(const command of ['webhook','worker']){
+  let invoked=false;const calls=[],env={...baseEnv()};delete env.TELEGRAM_OPS_MUTATIONS_ENABLED;
+  const result=command==='webhook'?await runWebhook({env,fetchImpl:fakeFetch({calls})}):await runWorker({env,fetchImpl:fakeFetch({calls}),createRuntime:()=>{invoked=true;return {drain:async()=>1};}});
+  assert.equal(result.ok,false);assert.equal(result.mutated,false);assert.equal(result.code,'MUTATION_PRECONDITION_FAILED');assert.equal(invoked,false);assert.equal(calls.length,0);
  }
 });
 
