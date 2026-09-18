@@ -1,8 +1,8 @@
-import {chromium} from 'playwright-core';
+import {launchChromium} from './helpers/browser.mjs';
 import assert from 'node:assert/strict';
 
 const base=process.env.TEST_BASE_URL||'http://127.0.0.1:4173';
-const browser=await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe'});
+const browser=await launchChromium({headless:true});
 try{
  for(const width of [390,1440]){
   const page=await browser.newPage({viewport:{width,height:900},deviceScaleFactor:1});

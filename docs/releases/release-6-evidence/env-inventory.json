@@ -1,0 +1,1646 @@
+{
+  "generatedFrom": {
+    "generatedFrom": "site/**/*.js,mjs,cjs,ts plus .env.example/telegram-ops ENV_NAMES",
+    "count": 33,
+    "variables": [
+      {
+        "name": "BOT_ENABLED",
+        "references": [
+          {
+            "file": "api/telegram-worker.js",
+            "line": 12,
+            "expression": "env.BOT_ENABLED"
+          },
+          {
+            "file": "server/bot-config.js",
+            "line": 40,
+            "expression": "flag(env,'BOT_ENABLED'"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 45,
+            "expression": "env.BOT_ENABLED"
+          },
+          {
+            "file": "tests/telegram-api.test.js",
+            "line": 15,
+            "expression": "process.env.BOT_ENABLED"
+          }
+        ]
+      },
+      {
+        "name": "BOT_REDIS_PREFIX",
+        "references": [
+          {
+            "file": "server/bot-config.js",
+            "line": 59,
+            "expression": "env.BOT_REDIS_PREFIX"
+          },
+          {
+            "file": "server/bot-config.js",
+            "line": 59,
+            "expression": "env.BOT_REDIS_PREFIX"
+          },
+          {
+            "file": "server/bot-config.js",
+            "line": 59,
+            "expression": "env.BOT_REDIS_PREFIX"
+          },
+          {
+            "file": "server/bot-runtime.js",
+            "line": 56,
+            "expression": "env.BOT_REDIS_PREFIX"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 173,
+            "expression": "env.BOT_REDIS_PREFIX"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 173,
+            "expression": "env.BOT_REDIS_PREFIX"
+          }
+        ]
+      },
+      {
+        "name": "BOT_REMINDERS_ENABLED",
+        "references": [
+          {
+            "file": "server/bot-config.js",
+            "line": 85,
+            "expression": "flag(env,'BOT_REMINDERS_ENABLED'"
+          }
+        ]
+      },
+      {
+        "name": "BOT_WEBHOOK_ENABLED",
+        "references": [
+          {
+            "file": "api/telegram-ops.js",
+            "line": 15,
+            "expression": "preconditions(env,'BOT_WEBHOOK_ENABLED'"
+          },
+          {
+            "file": "server/bot-config.js",
+            "line": 41,
+            "expression": "flag(env,'BOT_WEBHOOK_ENABLED'"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 77,
+            "expression": "preconditions(env,'BOT_WEBHOOK_ENABLED'"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 185,
+            "expression": "preconditions(env,'BOT_WEBHOOK_ENABLED'"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 214,
+            "expression": "preconditions(env,'BOT_WEBHOOK_ENABLED'"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 279,
+            "expression": "preconditions({},'BOT_WEBHOOK_ENABLED'"
+          }
+        ]
+      },
+      {
+        "name": "BOT_WORKER_ENABLED",
+        "references": [
+          {
+            "file": "api/telegram-worker.js",
+            "line": 12,
+            "expression": "env.BOT_WORKER_ENABLED"
+          },
+          {
+            "file": "server/bot-config.js",
+            "line": 42,
+            "expression": "flag(env,'BOT_WORKER_ENABLED'"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 235,
+            "expression": "preconditions(env,'BOT_WORKER_ENABLED'"
+          }
+        ]
+      },
+      {
+        "name": "FORM_DELIVERY_ENABLED",
+        "references": [
+          {
+            "file": "api/trial-requests.js",
+            "line": 10,
+            "expression": "process.env.FORM_DELIVERY_ENABLED"
+          },
+          {
+            "file": "build.js",
+            "line": 6,
+            "expression": "process.env.FORM_DELIVERY_ENABLED"
+          }
+        ]
+      },
+      {
+        "name": "HOST",
+        "references": [
+          {
+            "file": "server.js",
+            "line": 46,
+            "expression": "process.env.HOST"
+          }
+        ]
+      },
+      {
+        "name": "KV_REST_API_TOKEN",
+        "references": [
+          {
+            "file": "api/trial-requests.js",
+            "line": 16,
+            "expression": "process.env.KV_REST_API_TOKEN"
+          },
+          {
+            "file": "server/bot-config.js",
+            "line": 47,
+            "expression": "env.KV_REST_API_TOKEN"
+          },
+          {
+            "file": "server/bot-runtime.js",
+            "line": 55,
+            "expression": "env.KV_REST_API_TOKEN"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 156,
+            "expression": "env.KV_REST_API_TOKEN"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 167,
+            "expression": "env.KV_REST_API_TOKEN"
+          },
+          {
+            "file": "tests/telegram-ops.test.js",
+            "line": 119,
+            "expression": "env.KV_REST_API_TOKEN"
+          },
+          {
+            "file": "tests/upstash-integration.mjs",
+            "line": 6,
+            "expression": "process.env.KV_REST_API_TOKEN"
+          }
+        ]
+      },
+      {
+        "name": "KV_REST_API_URL",
+        "references": [
+          {
+            "file": "api/trial-requests.js",
+            "line": 15,
+            "expression": "process.env.KV_REST_API_URL"
+          },
+          {
+            "file": "server/bot-config.js",
+            "line": 46,
+            "expression": "env.KV_REST_API_URL"
+          },
+          {
+            "file": "server/bot-runtime.js",
+            "line": 54,
+            "expression": "env.KV_REST_API_URL"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 152,
+            "expression": "env.KV_REST_API_URL"
+          },
+          {
+            "file": "tests/telegram-ops.test.js",
+            "line": 119,
+            "expression": "env.KV_REST_API_URL"
+          },
+          {
+            "file": "tests/upstash-integration.mjs",
+            "line": 6,
+            "expression": "process.env.KV_REST_API_URL"
+          }
+        ]
+      },
+      {
+        "name": "PORT",
+        "references": [
+          {
+            "file": "server.js",
+            "line": 46,
+            "expression": "process.env.PORT"
+          },
+          {
+            "file": "server.js",
+            "line": 46,
+            "expression": "process.env.PORT"
+          }
+        ]
+      },
+      {
+        "name": "PRIVACY_CONSENT_VERSION",
+        "references": [
+          {
+            "file": "server/bot-config.js",
+            "line": 86,
+            "expression": "env.PRIVACY_CONSENT_VERSION"
+          },
+          {
+            "file": "server/bot-runtime.js",
+            "line": 67,
+            "expression": "env.PRIVACY_CONSENT_VERSION"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 54,
+            "expression": "env.PRIVACY_CONSENT_VERSION"
+          }
+        ]
+      },
+      {
+        "name": "PRIVACY_PUBLICATION_STATUS",
+        "references": [
+          {
+            "file": "server/bot-config.js",
+            "line": 86,
+            "expression": "env.PRIVACY_PUBLICATION_STATUS"
+          },
+          {
+            "file": "server/bot-runtime.js",
+            "line": 66,
+            "expression": "env.PRIVACY_PUBLICATION_STATUS"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 54,
+            "expression": "env.PRIVACY_PUBLICATION_STATUS"
+          }
+        ]
+      },
+      {
+        "name": "PRIVACY_URL",
+        "references": [
+          {
+            "file": "server/bot-config.js",
+            "line": 49,
+            "expression": "env.PRIVACY_URL"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 54,
+            "expression": "env.PRIVACY_URL"
+          }
+        ]
+      },
+      {
+        "name": "PUBLIC_ORIGIN",
+        "references": [
+          {
+            "file": "api/trial-requests.js",
+            "line": 12,
+            "expression": "process.env.PUBLIC_ORIGIN"
+          },
+          {
+            "file": "build.js",
+            "line": 8,
+            "expression": "process.env.PUBLIC_ORIGIN"
+          },
+          {
+            "file": "server/bot-config.js",
+            "line": 53,
+            "expression": "env.PUBLIC_ORIGIN"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 36,
+            "expression": "env.PUBLIC_ORIGIN"
+          },
+          {
+            "file": "server.js",
+            "line": 24,
+            "expression": "process.env.PUBLIC_ORIGIN"
+          },
+          {
+            "file": "server.js",
+            "line": 38,
+            "expression": "process.env.PUBLIC_ORIGIN"
+          }
+        ]
+      },
+      {
+        "name": "STATE_DIRECTORY",
+        "references": [
+          {
+            "file": "server.js",
+            "line": 11,
+            "expression": "process.env.STATE_DIRECTORY"
+          }
+        ]
+      },
+      {
+        "name": "TELEGRAM_BOT_TOKEN",
+        "references": [
+          {
+            "file": "api/trial-requests.js",
+            "line": 20,
+            "expression": "process.env.TELEGRAM_BOT_TOKEN"
+          },
+          {
+            "file": "server/bot-config.js",
+            "line": 52,
+            "expression": "env.TELEGRAM_BOT_TOKEN"
+          },
+          {
+            "file": "server/bot-runtime.js",
+            "line": 70,
+            "expression": "env.TELEGRAM_BOT_TOKEN"
+          },
+          {
+            "file": "server/bot-runtime.js",
+            "line": 85,
+            "expression": "env.TELEGRAM_BOT_TOKEN"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 83,
+            "expression": "env.TELEGRAM_BOT_TOKEN"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 106,
+            "expression": "env.TELEGRAM_BOT_TOKEN"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 125,
+            "expression": "env.TELEGRAM_BOT_TOKEN"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 187,
+            "expression": "env.TELEGRAM_BOT_TOKEN"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 217,
+            "expression": "env.TELEGRAM_BOT_TOKEN"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 238,
+            "expression": "env.TELEGRAM_BOT_TOKEN"
+          },
+          {
+            "file": "server.js",
+            "line": 10,
+            "expression": "process.env.TELEGRAM_BOT_TOKEN"
+          },
+          {
+            "file": "server.js",
+            "line": 13,
+            "expression": "process.env.TELEGRAM_BOT_TOKEN"
+          },
+          {
+            "file": "tests/telegram-parent-review.test.js",
+            "line": 92,
+            "expression": "env.TELEGRAM_BOT_TOKEN"
+          }
+        ]
+      },
+      {
+        "name": "TELEGRAM_BOT_USERNAME",
+        "references": []
+      },
+      {
+        "name": "TELEGRAM_CHAT_ID_AK",
+        "references": [
+          {
+            "file": "api/trial-requests.js",
+            "line": 20,
+            "expression": "process.env.TELEGRAM_CHAT_ID_AK"
+          },
+          {
+            "file": "server.js",
+            "line": 10,
+            "expression": "process.env.TELEGRAM_CHAT_ID_AK"
+          },
+          {
+            "file": "server.js",
+            "line": 13,
+            "expression": "process.env.TELEGRAM_CHAT_ID_AK"
+          }
+        ]
+      },
+      {
+        "name": "TELEGRAM_SEND_TIMEOUT_MS",
+        "references": [
+          {
+            "file": "server/bot-config.js",
+            "line": 48,
+            "expression": "env.TELEGRAM_SEND_TIMEOUT_MS"
+          }
+        ]
+      },
+      {
+        "name": "TELEGRAM_STAFF_AUTH_MODE",
+        "references": [
+          {
+            "file": "server/bot-config.js",
+            "line": 45,
+            "expression": "env.TELEGRAM_STAFF_AUTH_MODE"
+          }
+        ]
+      },
+      {
+        "name": "TELEGRAM_STAFF_CHAT_ID",
+        "references": [
+          {
+            "file": "server/bot-config.js",
+            "line": 44,
+            "expression": "env.TELEGRAM_STAFF_CHAT_ID"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 102,
+            "expression": "env.TELEGRAM_STAFF_CHAT_ID"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 109,
+            "expression": "env.TELEGRAM_STAFF_CHAT_ID"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 109,
+            "expression": "env.TELEGRAM_STAFF_CHAT_ID"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 113,
+            "expression": "env.TELEGRAM_STAFF_CHAT_ID"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 128,
+            "expression": "env.TELEGRAM_STAFF_CHAT_ID"
+          }
+        ]
+      },
+      {
+        "name": "TELEGRAM_STAFF_USER_IDS",
+        "references": [
+          {
+            "file": "server/bot-config.js",
+            "line": 43,
+            "expression": "env.TELEGRAM_STAFF_USER_IDS"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 72,
+            "expression": "env.TELEGRAM_STAFF_USER_IDS"
+          }
+        ]
+      },
+      {
+        "name": "TELEGRAM_WEBHOOK_SECRET",
+        "references": [
+          {
+            "file": "api/telegram-webhook.js",
+            "line": 52,
+            "expression": "env.TELEGRAM_WEBHOOK_SECRET"
+          },
+          {
+            "file": "server/bot-config.js",
+            "line": 50,
+            "expression": "env.TELEGRAM_WEBHOOK_SECRET"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 217,
+            "expression": "env.TELEGRAM_WEBHOOK_SECRET"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 227,
+            "expression": "env.TELEGRAM_WEBHOOK_SECRET"
+          },
+          {
+            "file": "tests/phase1-contact.test.js",
+            "line": 200,
+            "expression": "env.TELEGRAM_WEBHOOK_SECRET"
+          },
+          {
+            "file": "tests/telegram-api.test.js",
+            "line": 12,
+            "expression": "env.TELEGRAM_WEBHOOK_SECRET"
+          },
+          {
+            "file": "tests/telegram-api.test.js",
+            "line": 17,
+            "expression": "env.TELEGRAM_WEBHOOK_SECRET"
+          }
+        ]
+      },
+      {
+        "name": "TELEGRAM_WORKER_SECRET",
+        "references": [
+          {
+            "file": "api/telegram-ops.js",
+            "line": 12,
+            "expression": "env.TELEGRAM_WORKER_SECRET"
+          },
+          {
+            "file": "api/telegram-ops.js",
+            "line": 14,
+            "expression": "env.TELEGRAM_WORKER_SECRET"
+          },
+          {
+            "file": "api/telegram-worker.js",
+            "line": 12,
+            "expression": "env.TELEGRAM_WORKER_SECRET"
+          },
+          {
+            "file": "api/telegram-worker.js",
+            "line": 15,
+            "expression": "env.TELEGRAM_WORKER_SECRET"
+          },
+          {
+            "file": "server/bot-config.js",
+            "line": 51,
+            "expression": "env.TELEGRAM_WORKER_SECRET"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 238,
+            "expression": "env.TELEGRAM_WORKER_SECRET"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 273,
+            "expression": "env.TELEGRAM_WORKER_SECRET"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 275,
+            "expression": "env.TELEGRAM_WORKER_SECRET"
+          },
+          {
+            "file": "tests/telegram-api.test.js",
+            "line": 23,
+            "expression": "env.TELEGRAM_WORKER_SECRET"
+          }
+        ]
+      },
+      {
+        "name": "TEST_BASE_URL",
+        "references": [
+          {
+            "file": "tests/browser.mjs",
+            "line": 5,
+            "expression": "process.env.TEST_BASE_URL"
+          },
+          {
+            "file": "tests/form-browser.mjs",
+            "line": 3,
+            "expression": "process.env.TEST_BASE_URL"
+          },
+          {
+            "file": "tests/mobile-locales.mjs",
+            "line": 1,
+            "expression": "process.env.TEST_BASE_URL"
+          },
+          {
+            "file": "tests/outcomes.mjs",
+            "line": 1,
+            "expression": "process.env.TEST_BASE_URL"
+          },
+          {
+            "file": "tests/portrait-browser.mjs",
+            "line": 4,
+            "expression": "process.env.TEST_BASE_URL"
+          }
+        ]
+      },
+      {
+        "name": "TEST_OUTPUT",
+        "references": [
+          {
+            "file": "tests/browser.mjs",
+            "line": 6,
+            "expression": "process.env.TEST_OUTPUT"
+          }
+        ]
+      },
+      {
+        "name": "UPSTASH_REDIS_REST_TOKEN",
+        "references": [
+          {
+            "file": "api/trial-requests.js",
+            "line": 16,
+            "expression": "process.env.UPSTASH_REDIS_REST_TOKEN"
+          },
+          {
+            "file": "server/bot-config.js",
+            "line": 47,
+            "expression": "env.UPSTASH_REDIS_REST_TOKEN"
+          },
+          {
+            "file": "server/bot-runtime.js",
+            "line": 55,
+            "expression": "env.UPSTASH_REDIS_REST_TOKEN"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 156,
+            "expression": "env.UPSTASH_REDIS_REST_TOKEN"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 167,
+            "expression": "env.UPSTASH_REDIS_REST_TOKEN"
+          },
+          {
+            "file": "tests/telegram-ops.test.js",
+            "line": 119,
+            "expression": "env.UPSTASH_REDIS_REST_TOKEN"
+          },
+          {
+            "file": "tests/upstash-integration.mjs",
+            "line": 6,
+            "expression": "process.env.UPSTASH_REDIS_REST_TOKEN"
+          }
+        ]
+      },
+      {
+        "name": "UPSTASH_REDIS_REST_URL",
+        "references": [
+          {
+            "file": "api/trial-requests.js",
+            "line": 15,
+            "expression": "process.env.UPSTASH_REDIS_REST_URL"
+          },
+          {
+            "file": "server/bot-config.js",
+            "line": 46,
+            "expression": "env.UPSTASH_REDIS_REST_URL"
+          },
+          {
+            "file": "server/bot-runtime.js",
+            "line": 54,
+            "expression": "env.UPSTASH_REDIS_REST_URL"
+          },
+          {
+            "file": "server/telegram-ops.js",
+            "line": 152,
+            "expression": "env.UPSTASH_REDIS_REST_URL"
+          },
+          {
+            "file": "tests/telegram-ops.test.js",
+            "line": 119,
+            "expression": "env.UPSTASH_REDIS_REST_URL"
+          },
+          {
+            "file": "tests/telegram-ops.test.js",
+            "line": 120,
+            "expression": "env.UPSTASH_REDIS_REST_URL"
+          },
+          {
+            "file": "tests/upstash-integration.mjs",
+            "line": 6,
+            "expression": "process.env.UPSTASH_REDIS_REST_URL"
+          }
+        ]
+      },
+      {
+        "name": "VERCEL",
+        "references": [
+          {
+            "file": "server/telegram-ops.js",
+            "line": 41,
+            "expression": "env.VERCEL"
+          }
+        ]
+      },
+      {
+        "name": "VERCEL_ENV",
+        "references": [
+          {
+            "file": "server/telegram-ops.js",
+            "line": 42,
+            "expression": "env.VERCEL_ENV"
+          }
+        ]
+      },
+      {
+        "name": "VERCEL_GIT_COMMIT_REF",
+        "references": [
+          {
+            "file": "server/telegram-ops.js",
+            "line": 37,
+            "expression": "env.VERCEL_GIT_COMMIT_REF"
+          }
+        ]
+      },
+      {
+        "name": "WEB_TELEGRAM_BRIDGE_ENABLED",
+        "references": []
+      },
+      {
+        "name": "WEB_TELEGRAM_BRIDGE_SECRET",
+        "references": []
+      }
+    ]
+  },
+  "categories": [
+    {
+      "name": "BOT_ENABLED",
+      "references": [
+        {
+          "file": "api/telegram-worker.js",
+          "line": 12,
+          "expression": "env.BOT_ENABLED"
+        },
+        {
+          "file": "server/bot-config.js",
+          "line": 40,
+          "expression": "flag(env,'BOT_ENABLED'"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 45,
+          "expression": "env.BOT_ENABLED"
+        },
+        {
+          "file": "tests/telegram-api.test.js",
+          "line": 15,
+          "expression": "process.env.BOT_ENABLED"
+        }
+      ],
+      "category": "BOT_REQUIRED",
+      "scope": "webhook + bot booking",
+      "requirement": "required to enable booking/webhook",
+      "notes": "Set in the intended Vercel scope; production launch remains owner-authorized only."
+    },
+    {
+      "name": "BOT_REDIS_PREFIX",
+      "references": [
+        {
+          "file": "server/bot-config.js",
+          "line": 59,
+          "expression": "env.BOT_REDIS_PREFIX"
+        },
+        {
+          "file": "server/bot-config.js",
+          "line": 59,
+          "expression": "env.BOT_REDIS_PREFIX"
+        },
+        {
+          "file": "server/bot-config.js",
+          "line": 59,
+          "expression": "env.BOT_REDIS_PREFIX"
+        },
+        {
+          "file": "server/bot-runtime.js",
+          "line": 56,
+          "expression": "env.BOT_REDIS_PREFIX"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 173,
+          "expression": "env.BOT_REDIS_PREFIX"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 173,
+          "expression": "env.BOT_REDIS_PREFIX"
+        }
+      ],
+      "category": "BOT_OPTIONAL",
+      "scope": "bot runtime",
+      "requirement": "optional defaults",
+      "notes": "Default {akbot}:; must contain a Redis hash-tag and be <=128 chars."
+    },
+    {
+      "name": "BOT_REMINDERS_ENABLED",
+      "references": [
+        {
+          "file": "server/bot-config.js",
+          "line": 85,
+          "expression": "flag(env,'BOT_REMINDERS_ENABLED'"
+        }
+      ],
+      "category": "DISABLED_FUTURE",
+      "scope": "bot/worker or bridge",
+      "requirement": "not launch-required; keep false/unset",
+      "notes": "Worker/reminders are future and no scheduler is authorized; bridge endpoint is intentionally 503."
+    },
+    {
+      "name": "BOT_WEBHOOK_ENABLED",
+      "references": [
+        {
+          "file": "api/telegram-ops.js",
+          "line": 15,
+          "expression": "preconditions(env,'BOT_WEBHOOK_ENABLED'"
+        },
+        {
+          "file": "server/bot-config.js",
+          "line": 41,
+          "expression": "flag(env,'BOT_WEBHOOK_ENABLED'"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 77,
+          "expression": "preconditions(env,'BOT_WEBHOOK_ENABLED'"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 185,
+          "expression": "preconditions(env,'BOT_WEBHOOK_ENABLED'"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 214,
+          "expression": "preconditions(env,'BOT_WEBHOOK_ENABLED'"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 279,
+          "expression": "preconditions({},'BOT_WEBHOOK_ENABLED'"
+        }
+      ],
+      "category": "BOT_REQUIRED",
+      "scope": "webhook + bot booking",
+      "requirement": "required to enable booking/webhook",
+      "notes": "Set in the intended Vercel scope; production launch remains owner-authorized only."
+    },
+    {
+      "name": "BOT_WORKER_ENABLED",
+      "references": [
+        {
+          "file": "api/telegram-worker.js",
+          "line": 12,
+          "expression": "env.BOT_WORKER_ENABLED"
+        },
+        {
+          "file": "server/bot-config.js",
+          "line": 42,
+          "expression": "flag(env,'BOT_WORKER_ENABLED'"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 235,
+          "expression": "preconditions(env,'BOT_WORKER_ENABLED'"
+        }
+      ],
+      "category": "DISABLED_FUTURE",
+      "scope": "bot/worker or bridge",
+      "requirement": "not launch-required; keep false/unset",
+      "notes": "Worker/reminders are future and no scheduler is authorized; bridge endpoint is intentionally 503."
+    },
+    {
+      "name": "FORM_DELIVERY_ENABLED",
+      "references": [
+        {
+          "file": "api/trial-requests.js",
+          "line": 10,
+          "expression": "process.env.FORM_DELIVERY_ENABLED"
+        },
+        {
+          "file": "build.js",
+          "line": 6,
+          "expression": "process.env.FORM_DELIVERY_ENABLED"
+        }
+      ],
+      "category": "FORM_REQUIRED",
+      "scope": "Vercel web form",
+      "requirement": "required when form delivery is enabled",
+      "notes": "true enables Telegram form delivery; false is demo/preview."
+    },
+    {
+      "name": "HOST",
+      "references": [
+        {
+          "file": "server.js",
+          "line": 46,
+          "expression": "process.env.HOST"
+        }
+      ],
+      "category": "LOCAL_ONLY",
+      "scope": "local server",
+      "requirement": "optional",
+      "notes": "Used only by site/server.js local runtime."
+    },
+    {
+      "name": "KV_REST_API_TOKEN",
+      "references": [
+        {
+          "file": "api/trial-requests.js",
+          "line": 16,
+          "expression": "process.env.KV_REST_API_TOKEN"
+        },
+        {
+          "file": "server/bot-config.js",
+          "line": 47,
+          "expression": "env.KV_REST_API_TOKEN"
+        },
+        {
+          "file": "server/bot-runtime.js",
+          "line": 55,
+          "expression": "env.KV_REST_API_TOKEN"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 156,
+          "expression": "env.KV_REST_API_TOKEN"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 167,
+          "expression": "env.KV_REST_API_TOKEN"
+        },
+        {
+          "file": "tests/telegram-ops.test.js",
+          "line": 119,
+          "expression": "env.KV_REST_API_TOKEN"
+        },
+        {
+          "file": "tests/upstash-integration.mjs",
+          "line": 6,
+          "expression": "process.env.KV_REST_API_TOKEN"
+        }
+      ],
+      "category": "REDIS_ALTERNATIVE",
+      "scope": "form + bot",
+      "requirement": "one URL/token pair required for enabled delivery",
+      "notes": "Prefer UPSTASH_REDIS_REST_*; KV_REST_API_* are compatibility aliases, never mix pairs."
+    },
+    {
+      "name": "KV_REST_API_URL",
+      "references": [
+        {
+          "file": "api/trial-requests.js",
+          "line": 15,
+          "expression": "process.env.KV_REST_API_URL"
+        },
+        {
+          "file": "server/bot-config.js",
+          "line": 46,
+          "expression": "env.KV_REST_API_URL"
+        },
+        {
+          "file": "server/bot-runtime.js",
+          "line": 54,
+          "expression": "env.KV_REST_API_URL"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 152,
+          "expression": "env.KV_REST_API_URL"
+        },
+        {
+          "file": "tests/telegram-ops.test.js",
+          "line": 119,
+          "expression": "env.KV_REST_API_URL"
+        },
+        {
+          "file": "tests/upstash-integration.mjs",
+          "line": 6,
+          "expression": "process.env.KV_REST_API_URL"
+        }
+      ],
+      "category": "REDIS_ALTERNATIVE",
+      "scope": "form + bot",
+      "requirement": "one URL/token pair required for enabled delivery",
+      "notes": "Prefer UPSTASH_REDIS_REST_*; KV_REST_API_* are compatibility aliases, never mix pairs."
+    },
+    {
+      "name": "PORT",
+      "references": [
+        {
+          "file": "server.js",
+          "line": 46,
+          "expression": "process.env.PORT"
+        },
+        {
+          "file": "server.js",
+          "line": 46,
+          "expression": "process.env.PORT"
+        }
+      ],
+      "category": "LOCAL_ONLY",
+      "scope": "local server",
+      "requirement": "optional",
+      "notes": "Used only by site/server.js local runtime."
+    },
+    {
+      "name": "PRIVACY_CONSENT_VERSION",
+      "references": [
+        {
+          "file": "server/bot-config.js",
+          "line": 86,
+          "expression": "env.PRIVACY_CONSENT_VERSION"
+        },
+        {
+          "file": "server/bot-runtime.js",
+          "line": 67,
+          "expression": "env.PRIVACY_CONSENT_VERSION"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 54,
+          "expression": "env.PRIVACY_CONSENT_VERSION"
+        }
+      ],
+      "category": "BOT_REQUIRED",
+      "scope": "webhook + bot booking",
+      "requirement": "required to enable booking/webhook",
+      "notes": "Set in the intended Vercel scope; production launch remains owner-authorized only."
+    },
+    {
+      "name": "PRIVACY_PUBLICATION_STATUS",
+      "references": [
+        {
+          "file": "server/bot-config.js",
+          "line": 86,
+          "expression": "env.PRIVACY_PUBLICATION_STATUS"
+        },
+        {
+          "file": "server/bot-runtime.js",
+          "line": 66,
+          "expression": "env.PRIVACY_PUBLICATION_STATUS"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 54,
+          "expression": "env.PRIVACY_PUBLICATION_STATUS"
+        }
+      ],
+      "category": "BOT_REQUIRED",
+      "scope": "webhook + bot booking",
+      "requirement": "required to enable booking/webhook",
+      "notes": "Set in the intended Vercel scope; production launch remains owner-authorized only."
+    },
+    {
+      "name": "PRIVACY_URL",
+      "references": [
+        {
+          "file": "server/bot-config.js",
+          "line": 49,
+          "expression": "env.PRIVACY_URL"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 54,
+          "expression": "env.PRIVACY_URL"
+        }
+      ],
+      "category": "BOT_REQUIRED",
+      "scope": "webhook + bot booking",
+      "requirement": "required to enable booking/webhook",
+      "notes": "Set in the intended Vercel scope; production launch remains owner-authorized only."
+    },
+    {
+      "name": "PUBLIC_ORIGIN",
+      "references": [
+        {
+          "file": "api/trial-requests.js",
+          "line": 12,
+          "expression": "process.env.PUBLIC_ORIGIN"
+        },
+        {
+          "file": "build.js",
+          "line": 8,
+          "expression": "process.env.PUBLIC_ORIGIN"
+        },
+        {
+          "file": "server/bot-config.js",
+          "line": 53,
+          "expression": "env.PUBLIC_ORIGIN"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 36,
+          "expression": "env.PUBLIC_ORIGIN"
+        },
+        {
+          "file": "server.js",
+          "line": 24,
+          "expression": "process.env.PUBLIC_ORIGIN"
+        },
+        {
+          "file": "server.js",
+          "line": 38,
+          "expression": "process.env.PUBLIC_ORIGIN"
+        }
+      ],
+      "category": "FORM_AND_BOT_REQUIRED",
+      "scope": "Vercel form + webhook bot",
+      "requirement": "required for the enabled paths that use it",
+      "notes": "Set exact HTTPS origin without trailing slash; current trial endpoint compares Origin literally while bot validation normalizes one slash."
+    },
+    {
+      "name": "STATE_DIRECTORY",
+      "references": [
+        {
+          "file": "server.js",
+          "line": 11,
+          "expression": "process.env.STATE_DIRECTORY"
+        }
+      ],
+      "category": "LOCAL_ONLY",
+      "scope": "local server",
+      "requirement": "optional",
+      "notes": "Used only by site/server.js local runtime."
+    },
+    {
+      "name": "TELEGRAM_BOT_TOKEN",
+      "references": [
+        {
+          "file": "api/trial-requests.js",
+          "line": 20,
+          "expression": "process.env.TELEGRAM_BOT_TOKEN"
+        },
+        {
+          "file": "server/bot-config.js",
+          "line": 52,
+          "expression": "env.TELEGRAM_BOT_TOKEN"
+        },
+        {
+          "file": "server/bot-runtime.js",
+          "line": 70,
+          "expression": "env.TELEGRAM_BOT_TOKEN"
+        },
+        {
+          "file": "server/bot-runtime.js",
+          "line": 85,
+          "expression": "env.TELEGRAM_BOT_TOKEN"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 83,
+          "expression": "env.TELEGRAM_BOT_TOKEN"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 106,
+          "expression": "env.TELEGRAM_BOT_TOKEN"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 125,
+          "expression": "env.TELEGRAM_BOT_TOKEN"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 187,
+          "expression": "env.TELEGRAM_BOT_TOKEN"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 217,
+          "expression": "env.TELEGRAM_BOT_TOKEN"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 238,
+          "expression": "env.TELEGRAM_BOT_TOKEN"
+        },
+        {
+          "file": "server.js",
+          "line": 10,
+          "expression": "process.env.TELEGRAM_BOT_TOKEN"
+        },
+        {
+          "file": "server.js",
+          "line": 13,
+          "expression": "process.env.TELEGRAM_BOT_TOKEN"
+        },
+        {
+          "file": "tests/telegram-parent-review.test.js",
+          "line": 92,
+          "expression": "env.TELEGRAM_BOT_TOKEN"
+        }
+      ],
+      "category": "FORM_AND_BOT_REQUIRED",
+      "scope": "Vercel form + webhook bot",
+      "requirement": "required for the enabled paths that use it",
+      "notes": "Set in the intended Vercel scope; production launch remains owner-authorized only."
+    },
+    {
+      "name": "TELEGRAM_BOT_USERNAME",
+      "references": [],
+      "category": "BOT_OPTIONAL",
+      "scope": "ops inventory",
+      "requirement": "not runtime-required",
+      "notes": "Listed for ops presence only; runtime identity is checked against hardcoded ak_loewenbot."
+    },
+    {
+      "name": "TELEGRAM_CHAT_ID_AK",
+      "references": [
+        {
+          "file": "api/trial-requests.js",
+          "line": 20,
+          "expression": "process.env.TELEGRAM_CHAT_ID_AK"
+        },
+        {
+          "file": "server.js",
+          "line": 10,
+          "expression": "process.env.TELEGRAM_CHAT_ID_AK"
+        },
+        {
+          "file": "server.js",
+          "line": 13,
+          "expression": "process.env.TELEGRAM_CHAT_ID_AK"
+        }
+      ],
+      "category": "FORM_REQUIRED",
+      "scope": "Vercel web form",
+      "requirement": "required when form delivery is enabled",
+      "notes": "Required by api/trial-requests.js."
+    },
+    {
+      "name": "TELEGRAM_SEND_TIMEOUT_MS",
+      "references": [
+        {
+          "file": "server/bot-config.js",
+          "line": 48,
+          "expression": "env.TELEGRAM_SEND_TIMEOUT_MS"
+        }
+      ],
+      "category": "BOT_OPTIONAL",
+      "scope": "bot runtime",
+      "requirement": "optional defaults",
+      "notes": "Default 8000 ms; valid range 250–10000."
+    },
+    {
+      "name": "TELEGRAM_STAFF_AUTH_MODE",
+      "references": [
+        {
+          "file": "server/bot-config.js",
+          "line": 45,
+          "expression": "env.TELEGRAM_STAFF_AUTH_MODE"
+        }
+      ],
+      "category": "BOT_CONFIG",
+      "scope": "bot staff authorization",
+      "requirement": "optional default allowlist; explicit recommended",
+      "notes": "allowlist requires non-empty TELEGRAM_STAFF_USER_IDS; group_members authorizes current group members and still requires bot admin."
+    },
+    {
+      "name": "TELEGRAM_STAFF_CHAT_ID",
+      "references": [
+        {
+          "file": "server/bot-config.js",
+          "line": 44,
+          "expression": "env.TELEGRAM_STAFF_CHAT_ID"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 102,
+          "expression": "env.TELEGRAM_STAFF_CHAT_ID"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 109,
+          "expression": "env.TELEGRAM_STAFF_CHAT_ID"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 109,
+          "expression": "env.TELEGRAM_STAFF_CHAT_ID"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 113,
+          "expression": "env.TELEGRAM_STAFF_CHAT_ID"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 128,
+          "expression": "env.TELEGRAM_STAFF_CHAT_ID"
+        }
+      ],
+      "category": "BOT_REQUIRED",
+      "scope": "webhook + bot booking",
+      "requirement": "required to enable booking/webhook",
+      "notes": "Set in the intended Vercel scope; production launch remains owner-authorized only."
+    },
+    {
+      "name": "TELEGRAM_STAFF_USER_IDS",
+      "references": [
+        {
+          "file": "server/bot-config.js",
+          "line": 43,
+          "expression": "env.TELEGRAM_STAFF_USER_IDS"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 72,
+          "expression": "env.TELEGRAM_STAFF_USER_IDS"
+        }
+      ],
+      "category": "BOT_CONFIG",
+      "scope": "bot staff authorization",
+      "requirement": "required in allowlist mode; optional in group_members",
+      "notes": "Comma-separated positive Telegram user IDs."
+    },
+    {
+      "name": "TELEGRAM_WEBHOOK_SECRET",
+      "references": [
+        {
+          "file": "api/telegram-webhook.js",
+          "line": 52,
+          "expression": "env.TELEGRAM_WEBHOOK_SECRET"
+        },
+        {
+          "file": "server/bot-config.js",
+          "line": 50,
+          "expression": "env.TELEGRAM_WEBHOOK_SECRET"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 217,
+          "expression": "env.TELEGRAM_WEBHOOK_SECRET"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 227,
+          "expression": "env.TELEGRAM_WEBHOOK_SECRET"
+        },
+        {
+          "file": "tests/phase1-contact.test.js",
+          "line": 200,
+          "expression": "env.TELEGRAM_WEBHOOK_SECRET"
+        },
+        {
+          "file": "tests/telegram-api.test.js",
+          "line": 12,
+          "expression": "env.TELEGRAM_WEBHOOK_SECRET"
+        },
+        {
+          "file": "tests/telegram-api.test.js",
+          "line": 17,
+          "expression": "env.TELEGRAM_WEBHOOK_SECRET"
+        }
+      ],
+      "category": "BOT_REQUIRED",
+      "scope": "webhook + bot booking",
+      "requirement": "required to enable booking/webhook",
+      "notes": "Set in the intended Vercel scope; production launch remains owner-authorized only."
+    },
+    {
+      "name": "TELEGRAM_WORKER_SECRET",
+      "references": [
+        {
+          "file": "api/telegram-ops.js",
+          "line": 12,
+          "expression": "env.TELEGRAM_WORKER_SECRET"
+        },
+        {
+          "file": "api/telegram-ops.js",
+          "line": 14,
+          "expression": "env.TELEGRAM_WORKER_SECRET"
+        },
+        {
+          "file": "api/telegram-worker.js",
+          "line": 12,
+          "expression": "env.TELEGRAM_WORKER_SECRET"
+        },
+        {
+          "file": "api/telegram-worker.js",
+          "line": 15,
+          "expression": "env.TELEGRAM_WORKER_SECRET"
+        },
+        {
+          "file": "server/bot-config.js",
+          "line": 51,
+          "expression": "env.TELEGRAM_WORKER_SECRET"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 238,
+          "expression": "env.TELEGRAM_WORKER_SECRET"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 273,
+          "expression": "env.TELEGRAM_WORKER_SECRET"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 275,
+          "expression": "env.TELEGRAM_WORKER_SECRET"
+        },
+        {
+          "file": "tests/telegram-api.test.js",
+          "line": 23,
+          "expression": "env.TELEGRAM_WORKER_SECRET"
+        }
+      ],
+      "category": "DISABLED_FUTURE",
+      "scope": "bot/worker or bridge",
+      "requirement": "not launch-required; keep false/unset",
+      "notes": "Worker/reminders are future and no scheduler is authorized; bridge endpoint is intentionally 503."
+    },
+    {
+      "name": "TEST_BASE_URL",
+      "references": [
+        {
+          "file": "tests/browser.mjs",
+          "line": 5,
+          "expression": "process.env.TEST_BASE_URL"
+        },
+        {
+          "file": "tests/form-browser.mjs",
+          "line": 3,
+          "expression": "process.env.TEST_BASE_URL"
+        },
+        {
+          "file": "tests/mobile-locales.mjs",
+          "line": 1,
+          "expression": "process.env.TEST_BASE_URL"
+        },
+        {
+          "file": "tests/outcomes.mjs",
+          "line": 1,
+          "expression": "process.env.TEST_BASE_URL"
+        },
+        {
+          "file": "tests/portrait-browser.mjs",
+          "line": 4,
+          "expression": "process.env.TEST_BASE_URL"
+        }
+      ],
+      "category": "TEST_ONLY",
+      "scope": "tests",
+      "requirement": "not deployed",
+      "notes": "Verification harness variables."
+    },
+    {
+      "name": "TEST_OUTPUT",
+      "references": [
+        {
+          "file": "tests/browser.mjs",
+          "line": 6,
+          "expression": "process.env.TEST_OUTPUT"
+        }
+      ],
+      "category": "TEST_ONLY",
+      "scope": "tests",
+      "requirement": "not deployed",
+      "notes": "Verification harness variables."
+    },
+    {
+      "name": "UPSTASH_REDIS_REST_TOKEN",
+      "references": [
+        {
+          "file": "api/trial-requests.js",
+          "line": 16,
+          "expression": "process.env.UPSTASH_REDIS_REST_TOKEN"
+        },
+        {
+          "file": "server/bot-config.js",
+          "line": 47,
+          "expression": "env.UPSTASH_REDIS_REST_TOKEN"
+        },
+        {
+          "file": "server/bot-runtime.js",
+          "line": 55,
+          "expression": "env.UPSTASH_REDIS_REST_TOKEN"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 156,
+          "expression": "env.UPSTASH_REDIS_REST_TOKEN"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 167,
+          "expression": "env.UPSTASH_REDIS_REST_TOKEN"
+        },
+        {
+          "file": "tests/telegram-ops.test.js",
+          "line": 119,
+          "expression": "env.UPSTASH_REDIS_REST_TOKEN"
+        },
+        {
+          "file": "tests/upstash-integration.mjs",
+          "line": 6,
+          "expression": "process.env.UPSTASH_REDIS_REST_TOKEN"
+        }
+      ],
+      "category": "REDIS_ALTERNATIVE",
+      "scope": "form + bot",
+      "requirement": "one URL/token pair required for enabled delivery",
+      "notes": "Prefer UPSTASH_REDIS_REST_*; KV_REST_API_* are compatibility aliases, never mix pairs."
+    },
+    {
+      "name": "UPSTASH_REDIS_REST_URL",
+      "references": [
+        {
+          "file": "api/trial-requests.js",
+          "line": 15,
+          "expression": "process.env.UPSTASH_REDIS_REST_URL"
+        },
+        {
+          "file": "server/bot-config.js",
+          "line": 46,
+          "expression": "env.UPSTASH_REDIS_REST_URL"
+        },
+        {
+          "file": "server/bot-runtime.js",
+          "line": 54,
+          "expression": "env.UPSTASH_REDIS_REST_URL"
+        },
+        {
+          "file": "server/telegram-ops.js",
+          "line": 152,
+          "expression": "env.UPSTASH_REDIS_REST_URL"
+        },
+        {
+          "file": "tests/telegram-ops.test.js",
+          "line": 119,
+          "expression": "env.UPSTASH_REDIS_REST_URL"
+        },
+        {
+          "file": "tests/telegram-ops.test.js",
+          "line": 120,
+          "expression": "env.UPSTASH_REDIS_REST_URL"
+        },
+        {
+          "file": "tests/upstash-integration.mjs",
+          "line": 6,
+          "expression": "process.env.UPSTASH_REDIS_REST_URL"
+        }
+      ],
+      "category": "REDIS_ALTERNATIVE",
+      "scope": "form + bot",
+      "requirement": "one URL/token pair required for enabled delivery",
+      "notes": "Prefer UPSTASH_REDIS_REST_*; KV_REST_API_* are compatibility aliases, never mix pairs."
+    },
+    {
+      "name": "VERCEL",
+      "references": [
+        {
+          "file": "server/telegram-ops.js",
+          "line": 41,
+          "expression": "env.VERCEL"
+        }
+      ],
+      "category": "PLATFORM_OPS",
+      "scope": "Vercel/ops diagnostics",
+      "requirement": "platform-provided",
+      "notes": "telegram-ops preview guard; verify deployed values, do not hand-author secrets."
+    },
+    {
+      "name": "VERCEL_ENV",
+      "references": [
+        {
+          "file": "server/telegram-ops.js",
+          "line": 42,
+          "expression": "env.VERCEL_ENV"
+        }
+      ],
+      "category": "PLATFORM_OPS",
+      "scope": "Vercel/ops diagnostics",
+      "requirement": "platform-provided",
+      "notes": "telegram-ops preview guard; verify deployed values, do not hand-author secrets."
+    },
+    {
+      "name": "VERCEL_GIT_COMMIT_REF",
+      "references": [
+        {
+          "file": "server/telegram-ops.js",
+          "line": 37,
+          "expression": "env.VERCEL_GIT_COMMIT_REF"
+        }
+      ],
+      "category": "PLATFORM_OPS",
+      "scope": "Vercel/ops diagnostics",
+      "requirement": "platform-provided",
+      "notes": "telegram-ops preview guard; verify deployed values, do not hand-author secrets."
+    },
+    {
+      "name": "WEB_TELEGRAM_BRIDGE_ENABLED",
+      "references": [],
+      "category": "DISABLED_FUTURE",
+      "scope": "bot/worker or bridge",
+      "requirement": "not launch-required; keep false/unset",
+      "notes": "Worker/reminders are future and no scheduler is authorized; bridge endpoint is intentionally 503."
+    },
+    {
+      "name": "WEB_TELEGRAM_BRIDGE_SECRET",
+      "references": [],
+      "category": "DISABLED_FUTURE",
+      "scope": "bot/worker or bridge",
+      "requirement": "not launch-required; keep false/unset",
+      "notes": "Worker/reminders are future and no scheduler is authorized; bridge endpoint is intentionally 503."
+    }
+  ]
+}

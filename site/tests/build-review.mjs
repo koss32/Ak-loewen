@@ -1,11 +1,13 @@
 import {execFileSync} from 'node:child_process';
-import {readFileSync} from 'node:fs';
+import {readFileSync,readdirSync} from 'node:fs';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 
 try {
  execFileSync(process.execPath,['build.js'],{env:{...process.env,FORM_DELIVERY_ENABLED:'true'}});
- const html=readFileSync('dist/ak-loewen-valset-release-3.html','utf8');
+ const standalone=readdirSync('dist').find(name=>/^ak-loewen-valset-.*\.html$/.test(name));
+ assert.ok(standalone,'standalone build artifact exists');
+ const html=readFileSync(`dist/${standalone}`,'utf8');
  const metadata=html.match(/<script>(window\.__AK_PAGES__=[\s\S]*?)<\/script>/)[1];
  const context={window:{}};vm.runInNewContext(metadata,context);
  for(const pages of Object.values(context.window.__AK_PAGES__)){
@@ -19,7 +21,7 @@ try {
  }
  const head=html.slice(0,html.indexOf('<script>window.__AK_PAGES__'));
  assert.doesNotMatch(head,/(?:src|srcset)="\/assets\//);
- console.log('PASS: Release 3 standalone embeds trainer assets and keeps every locale in demo mode.');
+ console.log('PASS: standalone build embeds trainer assets and keeps every locale in demo mode.');
 } finally {
  execFileSync(process.execPath,['build.js'],{env:{...process.env,FORM_DELIVERY_ENABLED:'false'}});
 }

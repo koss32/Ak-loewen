@@ -1,6 +1,6 @@
 const base=process.env.TEST_BASE_URL||"http://127.0.0.1:4173";
-import {chromium} from 'playwright-core';
+import {launchChromium} from './helpers/browser.mjs';
 import {mkdir,writeFile} from 'node:fs/promises';
-const browser=await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true});
+const browser=await launchChromium({headless:true});
 const result=[];await mkdir('test-results/locales',{recursive:true});
 try{for(const locale of ['ru','uk','tr']){const c=await browser.newContext({viewport:{width:360,height:640}});await c.addInitScript(()=>{Element.prototype.requestPointerLock=()=>{};Element.prototype.setPointerCapture=()=>{};Element.prototype.releasePointerCapture=()=>{};});const p=await c.newPage();await p.goto(base+'/'+locale+'/');for(const id of ['start','preise','probetraining','valset','valset-groups']){await p.locator('#'+id).scrollIntoViewIfNeeded();await p.waitForTimeout(400);await p.screenshot({path:`test-results/locales/${locale}-${id}.png`});const overflow=await p.evaluate(()=>Array.from(document.querySelectorAll('main *')).filter(e=>{const r=e.getBoundingClientRect();return r.width&&r.right>innerWidth+1&&!e.closest('.glove-world')&&getComputedStyle(e).position!=='absolute';}).map(e=>({tag:e.tagName,cls:e.className,text:e.textContent.slice(0,70),right:e.getBoundingClientRect().right})));result.push({locale,id,overflow});}await c.close();}await writeFile('test-results/locales/report.json',JSON.stringify(result,null,2));console.log(JSON.stringify(result.filter(r=>r.overflow.length),null,2));}finally{await browser.close();}
