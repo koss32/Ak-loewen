@@ -164,21 +164,22 @@ function createStore({readSnapshot,commitSnapshot,clock,maxBytes=BOT_MAX_STATE_B
   transition:(key,revision,change,notifications=[])=>mutate(tx=>{const result=tx.updateRequest(key,revision,change);if(result.ok)for(const n of notifications)tx.enqueue(n.recipient,n.text,n.kind||'message',n.notBefore||clock(),{requestId:key,...n.meta});return result;}),
   enqueue:(...args)=>mutate(tx=>tx.enqueue(...args)),cancelCare:key=>mutate(tx=>tx.cancelCare(key)),
   leaseNext:(workerId,leaseMs=30000,{sourceUpdateId,immediateOnly=false,allowCare=true}={})=>mutate(tx=>{
-   const state=tx.raw,now=tx.now,selectedSource=sourceUpdateId===undefined?null:String(sourceUpdateId),items=Object.values(state.outbox),ceilings=new Map();
+   const state=tx.raw,now=tx.now,selectedSource=sourceUpdateId===undefined?null:String(sourceUpdateId),items=Object.values(state.outbox),ceilings=new Map(),directRecipients=new Set();
    // Include preceding immediate replies for these same recipients. Otherwise an
    // old conversation reply would block a new click until the background worker.
-   if(selectedSource!==null)for(const item of items)if(item.sourceUpdateId===selectedSource&&!BACKGROUND_KINDS.has(item.kind))ceilings.set(item.recipient,Math.max(ceilings.get(item.recipient)||0,item.sequence));
+   if(selectedSource!==null)for(const item of items)if(item.sourceUpdateId===selectedSource){directRecipients.add(item.recipient);if(!BACKGROUND_KINDS.has(item.kind))ceilings.set(item.recipient,Math.max(ceilings.get(item.recipient)||0,item.sequence));}
    const eligible=item=>{
     if(!allowCare&&['reminder','checkin'].includes(item.kind))return false;
     if(item.state!=='queued'||item.notBefore>now||(state.recipientBlockedUntil[item.recipient]||0)>now)return false;
     if(selectedSource!==null){
      if(immediateOnly&&BACKGROUND_KINDS.has(item.kind))return false;
-     return item.sourceUpdateId===selectedSource||(!BACKGROUND_KINDS.has(item.kind)&&item.sequence<=(ceilings.get(item.recipient)||0));
+     return item.sourceUpdateId===selectedSource||(!BACKGROUND_KINDS.has(item.kind)&&item.sequence<=(ceilings.get(item.recipient)||0))||(!immediateOnly&&item.kind==='interface-cleanup'&&directRecipients.has(item.recipient));
     }
     // Give fresh interaction work to its webhook; recover later only on failure.
     return !(item.sourceUpdateId!==undefined&&!BACKGROUND_KINDS.has(item.kind)&&item.createdAt+BOT_INTERACTIVE_DISPATCH_GRACE_MS>now);
    };
-   const candidates=items.filter(eligible).sort((a,b)=>(a.kind==='callback-answer'?0:1)-(b.kind==='callback-answer'?0:1)||a.notBefore-b.notBefore||a.sequence-b.sequence||a.createdAt-b.createdAt);
+   const backgroundPriority=item=>selectedSource!==null&&!immediateOnly&&item.kind==='interface-cleanup'?(item.sourceUpdateId===selectedSource?0:1):0;
+   const candidates=items.filter(eligible).sort((a,b)=>(a.kind==='callback-answer'?0:1)-(b.kind==='callback-answer'?0:1)||backgroundPriority(a)-backgroundPriority(b)||a.notBefore-b.notBefore||a.sequence-b.sequence||a.createdAt-b.createdAt);
    for(const item of candidates){
     const active=items.some(other=>other.recipient===item.recipient&&other.id!==item.id&&['leased','sending'].includes(other.state));
     // A queued reminder must not hold up an interactive reply. Active delivery
