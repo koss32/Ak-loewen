@@ -5,7 +5,7 @@
   "outputDirectory": "dist",
   "trailingSlash": true,
   "git": {
-    "deploymentEnabled": false
+    "deploymentEnabled": true
   },
   "functions": {
     "api/trial-requests.js": {
