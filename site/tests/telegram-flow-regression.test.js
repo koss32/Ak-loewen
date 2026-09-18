@@ -4,7 +4,7 @@ import {createMemoryBotStore} from '../server/bot-store.js';
 import {createTelegramBot} from '../server/telegram-bot.js';
 import {legal} from '../src/data.js';
 
-const cfg={deliveryReady:true,sourceLegalStatus:'published',privacyUrl:'https://example.test/privacy',privacyStatus:'published',consentVersion:legal.consentVersion,staffUserIds:['55','56'],staffChatId:'99'};
+const cfg={deliveryReady:true,sourceLegalStatus:'published',privacyUrl:'https://example.test/privacy',privacyStatus:'published',consentVersion:legal.consentVersion,staffUserIds:['55','56'],staffChatId:'-10099'};
 const msg=(id,chat,text,user=chat,type='private')=>({update_id:id,message:{chat:{id:chat,type},from:{id:user},text}});
 const cb=(id,chat,data,user=chat,type='private')=>({update_id:id,callback_query:{id:`q${id}`,from:{id:user},data,message:{chat:{id:chat,type}}}});
 const messages=state=>Object.values(state.outbox).filter(x=>x.method==='sendMessage');
@@ -42,29 +42,29 @@ test('status exposes all sibling requests, protects IDs, and preserves comment l
  assert.ok(own.some(x=>x.text.includes('first'))&&own.some(x=>x.text.includes('second')));
  await bot.handle(msg(2,11,'/cancel first'));
  assert.match((await last(store,x=>x.recipient==='11')).text,/не найдено/);
- await bot.handle(msg(3,99,'/staff first',55,'group'));
- assert.match((await last(store,x=>x.recipient==='99'&&x.kind==='staff-card')).text,/line one\nline two/);
+ await bot.handle(msg(3,-10099,'/staff first',55,'group'));
+ assert.match((await last(store,x=>x.recipient==='-10099'&&x.kind==='staff-card')).text,/line one\nline two/);
 });
 
 test('staff preview can only be committed by the composing staff user and expires after a newer composition',async()=>{
  const store=createMemoryBotStore(),bot=createTelegramBot({store,config:cfg,verifyStaffMembership:async()=>true});
  await createRecord(store,{id:'staff-request'});
- await bot.handle(msg(1,99,'/staff staff-request',55,'group'));
+ await bot.handle(msg(1,-10099,'/staff staff-request',55,'group'));
  const reply=await button(store,'Antwort verfassen');
- await bot.handle(cb(2,99,reply,55,'group'));
- await bot.handle(msg(3,99,'first draft',55,'group'));
+ await bot.handle(cb(2,-10099,reply,55,'group'));
+ await bot.handle(msg(3,-10099,'first draft',55,'group'));
  const firstCommit=await button(store,'Antwort bestätigen');
  // Open a new compose session and make a new preview, invalidating the old action revision.
- await bot.handle(msg(4,99,'/staff staff-request',55,'group'));
+ await bot.handle(msg(4,-10099,'/staff staff-request',55,'group'));
  const newerReply=await button(store,'Antwort verfassen');
- await bot.handle(cb(5,99,newerReply,55,'group'));
- await bot.handle(msg(6,99,'second draft',55,'group'));
+ await bot.handle(cb(5,-10099,newerReply,55,'group'));
+ await bot.handle(msg(6,-10099,'second draft',55,'group'));
  const secondCommit=await button(store,'Antwort bestätigen');
- await bot.handle(cb(7,99,firstCommit,56,'group'));
+ await bot.handle(cb(7,-10099,firstCommit,56,'group'));
  assert.ok(!messages(await store.inspect()).some(x=>x.recipient==='10'&&/first draft/.test(x.text)));
- await bot.handle(cb(8,99,firstCommit,55,'group'));
+ await bot.handle(cb(8,-10099,firstCommit,55,'group'));
  assert.ok(!messages(await store.inspect()).some(x=>x.recipient==='10'&&/first draft/.test(x.text)));
- await bot.handle(cb(9,99,secondCommit,55,'group'));
+ await bot.handle(cb(9,-10099,secondCommit,55,'group'));
  assert.ok(messages(await store.inspect()).some(x=>x.recipient==='10'&&/second draft/.test(x.text)));
 });
 

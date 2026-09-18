@@ -14,8 +14,8 @@ export function parseStaffUserIds(value){
  return {ok:true,ids:[...new Set(parts)]};
 }
 
-/** Telegram group chat IDs may be negative; staff user IDs may not. */
-export function validStaffChatId(value){const raw=text(value),id=Number(raw);return /^-?\d+$/.test(raw)&&Number.isSafeInteger(id)&&id!==0&&String(id)===raw;}
+/** Staff routing is group-only in both authorization modes; private IDs are unsafe. */
+export function validStaffChatId(value){const raw=text(value),id=Number(raw);return /^-[1-9]\d*$/.test(raw)&&Number.isSafeInteger(id)&&id<0&&String(id)===raw;}
 
 /** PUBLIC_ORIGIN is an origin, not a URL prefix. A single trailing slash is harmless. */
 export function validPublicOrigin(value){
@@ -81,8 +81,10 @@ export function assessBotConfig(env=process.env,{requireEnabled=false,requireWeb
   if(!botToken)errors.push('BOT_TOKEN_MISSING');
  }
  const workerReady=workerEnabled&&safeSecret(workerSecret)&&Boolean(botToken)&&validTimeout(timeoutMs)&&(!requireRedis||Boolean(redisUrl&&redisToken));
- const bookingReady=legal.publicationStatus==='published'&&text(env.PRIVACY_PUBLICATION_STATUS)==='published'&&text(env.PRIVACY_CONSENT_VERSION)===legal.consentVersion&&Boolean(privacy)&&workerReady&&userIds.ok&&validStaffChatId(staffChatId)&&(staffAuthMode==='group_members'?Number(staffChatId)<0:staffAuthMode==='allowlist'&&userIds.ids.length>0);
- return {ok:errors.length===0,errors:[...new Set(errors)],enabled,webhookEnabled,workerEnabled,origin,privacyUrl:privacy?.href||'',timeoutMs,userIds:userIds.ids,staffChatId,staffAuthMode,workerReady,bookingReady};
+ const deliveryReady=Boolean(botToken)&&validTimeout(timeoutMs)&&(!requireRedis||Boolean(redisUrl&&redisToken));
+ const remindersEnabled=flag(env,'BOT_REMINDERS_ENABLED')&&workerReady;
+ const bookingReady=legal.publicationStatus==='published'&&text(env.PRIVACY_PUBLICATION_STATUS)==='published'&&text(env.PRIVACY_CONSENT_VERSION)===legal.consentVersion&&Boolean(privacy)&&deliveryReady&&userIds.ok&&validStaffChatId(staffChatId)&&(staffAuthMode==='group_members'?Number(staffChatId)<0:staffAuthMode==='allowlist'&&userIds.ids.length>0);
+ return {ok:errors.length===0,errors:[...new Set(errors)],enabled,webhookEnabled,workerEnabled,origin,privacyUrl:privacy?.href||'',timeoutMs,userIds:userIds.ids,staffChatId,staffAuthMode,workerReady,deliveryReady,remindersEnabled,bookingReady};
 }
 
 export const isValidTelegramSecret=safeSecret;

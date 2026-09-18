@@ -68,7 +68,7 @@ test('a valid button click renders the replacement and schedules delayed interfa
  assert.deepEqual(deliveries.map(item=>item.method),['answerCallbackQuery','sendMessage','deleteMessage']);
  assert.match(deliveries[1].body.text,/Bitte wähle eine Aktion/);
  const cleanup=Object.values((await store.inspect()).outbox).find(item=>item.method==='deleteMessage');
- assert.equal(cleanup.state,'sent');assert.equal(cleanup.notBefore,2500);
+ assert.equal(cleanup.state,'sent');assert.equal(cleanup.notBefore,2000);
  assert.deepEqual(deliveries.at(-1).body,{chat_id:'11',message_id:73});
  assert.ok(Object.values((await store.inspect()).outbox).filter(item=>item.sourceUpdateId==='441').every(item=>item.state==='sent'));
 });

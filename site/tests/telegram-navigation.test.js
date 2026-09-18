@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createMemoryBotStore} from '../server/bot-store.js';
 import {createTelegramBot} from '../server/telegram-bot.js';
+import {botCopy} from '../server/bot-copy.js';
 const message=(id,text)=>({update_id:id,message:{chat:{id:10,type:'private'},from:{id:10,language_code:'ru'},text}});
 const callback=(id,data)=>({update_id:id,callback_query:{id:`navigation-${id}`,from:{id:10},data,message:{chat:{id:10,type:'private'}}}});
 const latest=async store=>Object.values((await store.inspect()).outbox).filter(x=>x.method==='sendMessage').at(-1);
@@ -12,7 +13,9 @@ test('Sprache opens a separate selector; back preserves a draft; My requests is 
  await bot.handle(message(1,'/start'));
  const main=buttons(await latest(store));
  assert.equal(main.filter(x=>x.callback_data.startsWith('cmd:lang:')).length,0);
- assert.deepEqual(main.find(x=>x.callback_data==='cmd:language'),{text:'🌐 Sprache',callback_data:'cmd:language'});
+ assert.ok(main.some(x=>x.callback_data==='cmd:book'&&x.text===botCopy.ru.book));
+ assert.ok(main.some(x=>x.callback_data==='cmd:contact'&&x.text===botCopy.ru.contactButton));
+ assert.deepEqual(main.find(x=>x.callback_data==='cmd:language'),{text:`🌐 ${botCopy.ru.languageButton}`,callback_data:'cmd:language'});
  assert.ok(main.some(x=>x.callback_data==='cmd:status'&&x.text==='📋 Мои заявки'));
  await store.transactUpdate(2,tx=>tx.putSession(10,{locale:'ru',stage:'comment',contactName:'Existing Draft'}));
  await bot.handle(callback(3,'cmd:language'));

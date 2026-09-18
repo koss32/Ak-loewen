@@ -6,7 +6,7 @@ import {botCopy} from '../server/bot-copy.js';
 import {firstVisitCopy} from '../src/first-visit-copy.js';
 import {contacts,legal} from '../src/data.js';
 
-const config={deliveryReady:true,sourceLegalStatus:'published',privacyUrl:'https://example.test/privacy',privacyStatus:'published',consentVersion:legal.consentVersion,staffUserIds:['55'],staffChatId:'99'};
+const config={deliveryReady:true,sourceLegalStatus:'published',privacyUrl:'https://example.test/privacy',privacyStatus:'published',consentVersion:legal.consentVersion,staffUserIds:['55'],staffChatId:'-10099'};
 const message=(id,text)=>({update_id:id,message:{chat:{id:10,type:'private'},from:{id:10,language_code:'ru'},text}});
 const callback=(id,data,{chat=10,user=chat,type='private'}={})=>({update_id:id,callback_query:{id:`faq-${id}`,from:{id:user},data,message:{chat:{id:chat,type}}}});
 const messages=state=>Object.values(state.outbox).filter(item=>item.method==='sendMessage');
@@ -180,12 +180,12 @@ test('FAQ callbacks reject groups and other users without messages, data changes
  const {store,bot}=await fixture('ru');
  await store.transactUpdate('protected-draft',tx=>{
   tx.putSession(10,{locale:'ru',stage:'comment',contactName:'Private Parent',participantName:'Private Child'});
-  tx.putSession('staff:99:55',{locale:'de',stage:'staff-reply',requestId:'private-request',reply:'Private staff draft'});
+  tx.putSession('staff:-10099:55',{locale:'de',stage:'staff-reply',requestId:'private-request',reply:'Private staff draft'});
   tx.addAction({scope:'staff',type:'staff-reply',ownerUserId:'55',requestId:'private-request'});
  });
  const before=await store.inspect();
  let id=1;
- for(const identity of [{chat:99,user:55,type:'group'},{chat:-10099,user:55,type:'supergroup'},{chat:10,user:11},{chat:10,user:55}]){
+ for(const identity of [{chat:-10099,user:55,type:'group'},{chat:-10099,user:55,type:'supergroup'},{chat:10,user:11},{chat:10,user:55}]){
   for(const command of ['cmd:faq',...topics.map(([topic])=>`cmd:faq:${topic}`),'cmd:faq:unknown']){
    await bot.handle(callback(id++,command,identity));
    const after=await store.inspect();

@@ -12,7 +12,7 @@ export const BOT_CALLBACK_TTL_MS=15*1000;
 export const BOT_INTERACTIVE_DISPATCH_GRACE_MS=30*1000;
 const BACKGROUND_KINDS=new Set(['reminder','checkin','interface-cleanup']);
 const clone=value=>value===undefined?undefined:structuredClone(value);
-const freshState=()=>({schema:2,sessions:{},requests:{},requestSequence:0,clients:{},updates:{},actions:{},outbox:{},recipientSequence:{},recipientBlockedUntil:{}});
+const freshState=()=>({schema:2,sessions:{},requests:{},requestSequence:0,tickets:{},ticketSequence:0,clients:{},updates:{},actions:{},outbox:{},recipientSequence:{},recipientBlockedUntil:{}});
 const id=()=>randomUUID().replaceAll('-','');
 const berlinHour=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Berlin',hour:'2-digit',hourCycle:'h23'});
 const localHour=at=>Number(berlinHour.format(new Date(at)));
@@ -40,13 +40,26 @@ export function classifyTelegramResponse(response,body,method='sendMessage'){
  return {state:'uncertain'};
 }
 
+// Telegram has no idempotency key for sendMessage. Uncertain sends are terminal,
+// not automatically retried. Durable feedback makes this visible to the sender.
+function contactFeedback(state,item,result,now){
+ const feedback=item.meta?.feedback;
+ if(!feedback||item.feedbackQueued||!['sent','failed','uncertain'].includes(result.state))return;
+ item.feedbackQueued=true;
+ const text=result.state==='sent'?feedback.success:feedback[result.state];
+ if(!text)return;
+ const tx=txFacade(state,{now,updateId:item.sourceUpdateId??null,nonce:'feedback:'+item.id});
+ tx.enqueue(feedback.recipient,text,'contact-feedback',now,{ticketId:item.meta.ticketId,requireOpen:true,link_preview_options:{is_disabled:true},...clone(feedback.meta||{})});
+}
 function pruneState(state,now){
  for(const key of ['sessions','actions','updates','clients'])for(const [k,v] of Object.entries(state[key]||{}))if(v.expiresAt<=now)delete state[key][k];
  for(const [k,v] of Object.entries(state.requests||{}))if(v.expiresAt<=now)delete state.requests[k];
+ for(const [k,v] of Object.entries(state.tickets||{}))if(v.expiresAt<=now)delete state.tickets[k];
+ for(const [k,v] of Object.entries(state.sessions||{}))if(v.value?.ticketId&&!state.tickets[v.value.ticketId])delete state.sessions[k];
  for(const [k,v] of Object.entries(state.outbox||{})){
   if(v.expiresAt<=now){delete state.outbox[k];continue;}
   if(v.state==='leased'&&v.lease?.until<=now){v.state='queued';v.lease=null;}
-  else if(v.state==='sending'&&v.lease?.until<=now){v.state='uncertain';v.finishedAt=now;v.lease=null;}
+  else if(v.state==='sending'&&v.lease?.until<=now){v.state='uncertain';v.finishedAt=now;v.lease=null;contactFeedback(state,v,{state:'uncertain'},now);}
  }
  for(const [recipient,until] of Object.entries(state.recipientBlockedUntil||{}))if(until<=now)delete state.recipientBlockedUntil[recipient];
  // Sequence numbers are ordering metadata, not an unbounded per-recipient history.
@@ -68,6 +81,9 @@ function txFacade(state,{now,updateId,nonce}){
   getSession:key=>clone(state.sessions[String(key)]?.value),putSession,clearSession:key=>delete state.sessions[String(key)],
   getClient:userId=>clone(state.clients[String(userId)]),putClient:(userId,value)=>{const existing=state.clients[String(userId)]||{};state.clients[String(userId)]={...clone(existing),...clone(value),expiresAt:now+BOT_RETENTION_MS};},
   listClientRequests(userId){const clientUserId=String(userId);return Object.values(state.requests).filter(record=>record.expiresAt>now&&String(record.clientUserId)===clientUserId).sort((a,b)=>b.createdAt-a.createdAt||b.updatedAt-a.updatedAt||(String(a.id)<String(b.id)?1:String(a.id)>String(b.id)?-1:0)).map(clone);},
+  getTicket:ticketId=>clone(state.tickets[String(ticketId)]),
+  createTicket(record){let next=state.ticketSequence||0;do{next++;}while(state.tickets['C'+next]);state.ticketSequence=next;const saved={...clone(record),id:'C'+next,revision:token(16),createdAt:now,updatedAt:now,expiresAt:now+BOT_RETENTION_MS};state.tickets[saved.id]=saved;return clone(saved);},
+  patchTicket(ticketId,change){const current=state.tickets[String(ticketId)];if(!current)throw new Error('ticket_missing');const saved={...current,...clone(change),revision:token(16),updatedAt:now,expiresAt:now+BOT_RETENTION_MS};state.tickets[String(ticketId)]=saved;return clone(saved);},
   getRequest:request,
   createRequest(record){if(state.requests[record.id])throw new Error('request_exists');const saved={...clone(record),revision:token(16),appointmentRevision:token(16),preferenceRevision:token(16),createdAt:now,updatedAt:now,expiresAt:now+BOT_RETENTION_MS};state.requests[saved.id]=saved;return clone(saved);},
   updateRequest(requestId,expectedRevision,change){return this.patchRequest(requestId,{revision:expectedRevision},change);},
@@ -83,9 +99,33 @@ function txFacade(state,{now,updateId,nonce}){
   raw:state
  };
 }
+// The existing aggregate is deliberately small. Contact is not a transcript
+// database: after delivery keep compact card references/outcomes, not raw text.
+function compactContactHistory(state){
+ const terminal=new Set(['sent','failed','uncertain','cancelled']);
+ for(const item of Object.values(state.outbox)){
+  if(!String(item.kind).startsWith('contact-')||!terminal.has(item.state))continue;
+  const ticket=state.tickets[item.meta?.ticketId];
+  if(item.state==='sent'&&item.meta?.contactCard&&ticket?.status==='OPEN'){
+   item.text='';item.payload=undefined;item.meta={ticketId:ticket.id,contactCard:true,cardLocale:item.meta.cardLocale||'de'};
+  }else if(item.kind==='contact-client-reply'&&ticket?.status==='OPEN'){
+   // Retain the outcome (especially uncertain sends), never the reply text.
+   item.text='';item.payload=undefined;item.meta={ticketId:ticket.id};
+  }else delete state.outbox[item.id];
+ }
+ // Keep active delivery buttons and the most recent card's actions. Already
+ // selected replies live independently in per-trainer sessions.
+ const protectedTokens=new Set();
+ for(const item of Object.values(state.outbox))if(!terminal.has(item.state))for(const row of item.meta?.reply_markup?.inline_keyboard||[])for(const button of row)if(button.callback_data)protectedTokens.add(button.callback_data.slice(2));
+ const newest=new Map();
+ for(const [token,action] of Object.entries(state.actions))if(action.scope==='contact-staff'&&['contact-reply','contact-close'].includes(action.type))newest.set(action.ticketId+':'+action.type,token);
+ for(const [token,action] of Object.entries(state.actions))if(action.scope==='contact-staff'&&['contact-reply','contact-close'].includes(action.type)&&!protectedTokens.has(token)&&newest.get(action.ticketId+':'+action.type)!==token)delete state.actions[token];
+ const closed=Object.values(state.tickets).filter(ticket=>ticket.status==='CLOSED').sort((a,b)=>b.updatedAt-a.updatedAt);
+ for(const ticket of closed.slice(100))delete state.tickets[ticket.id];
+}
 function normalized(raw){
  if(!raw)return freshState();const parsed=typeof raw==='string'?JSON.parse(raw):clone(raw),base=freshState();
- return {...base,...parsed,sessions:parsed.sessions||{},requests:parsed.requests||{},requestSequence:Number.isSafeInteger(parsed.requestSequence)&&parsed.requestSequence>=0?parsed.requestSequence:0,clients:parsed.clients||{},updates:parsed.updates||{},actions:parsed.actions||{},outbox:parsed.outbox||{},recipientSequence:parsed.recipientSequence||{},recipientBlockedUntil:parsed.recipientBlockedUntil||{}};
+ return {...base,...parsed,sessions:parsed.sessions||{},requests:parsed.requests||{},tickets:parsed.tickets||{},ticketSequence:Number.isSafeInteger(parsed.ticketSequence)&&parsed.ticketSequence>=0?parsed.ticketSequence:0,requestSequence:Number.isSafeInteger(parsed.requestSequence)&&parsed.requestSequence>=0?parsed.requestSequence:0,clients:parsed.clients||{},updates:parsed.updates||{},actions:parsed.actions||{},outbox:parsed.outbox||{},recipientSequence:parsed.recipientSequence||{},recipientBlockedUntil:parsed.recipientBlockedUntil||{}};
 }
 function createStore({readSnapshot,commitSnapshot,clock,maxBytes=BOT_MAX_STATE_BYTES,kind}){
  const transact=async(updateId,reducer,{retries=64}={})=>{
@@ -95,7 +135,7 @@ function createStore({readSnapshot,commitSnapshot,clock,maxBytes=BOT_MAX_STATE_B
    const updateKey=updateId===undefined?null:String(updateId);if(updateKey&&state.updates[updateKey]?.expiresAt>now)return {ok:true,dropped:true};
    const result=reducer(txFacade(state,{now,updateId:updateKey,nonce}));if(result&&typeof result.then==='function')throw new Error('bot transaction reducer must be synchronous');
    if(updateKey)state.updates[updateKey]={expiresAt:now+BOT_RETENTION_MS};
-   const serialized=JSON.stringify(state);if(Buffer.byteLength(serialized)>maxBytes)throw new Error('BOT_STATE_CAPACITY_EXCEEDED');
+   let serialized=JSON.stringify(state);if(Buffer.byteLength(serialized)>maxBytes/2){compactContactHistory(state);serialized=JSON.stringify(state);}if(Buffer.byteLength(serialized)>maxBytes)throw new Error('BOT_STATE_CAPACITY_EXCEEDED');
    const generation=id();if(await commitSnapshot(snapshot.generation,generation,serialized))return {ok:true,result:clone(result)};
   }throw new Error('BOT_STORE_CONFLICT');
  };
@@ -108,12 +148,13 @@ function createStore({readSnapshot,commitSnapshot,clock,maxBytes=BOT_MAX_STATE_B
   createBooking:(record,staffRecipient,staffText)=>mutate(tx=>{const saved=tx.createRequest(record);if(staffRecipient&&staffText){const card=typeof staffText==='string'?{text:staffText}:staffText;tx.enqueue(staffRecipient,card.text,'staff-card',clock(),card.meta||{});}return saved;}),
   transition:(key,revision,change,notifications=[])=>mutate(tx=>{const result=tx.updateRequest(key,revision,change);if(result.ok)for(const n of notifications)tx.enqueue(n.recipient,n.text,n.kind||'message',n.notBefore||clock(),{requestId:key,...n.meta});return result;}),
   enqueue:(...args)=>mutate(tx=>tx.enqueue(...args)),cancelCare:key=>mutate(tx=>tx.cancelCare(key)),
-  leaseNext:(workerId,leaseMs=30000,{sourceUpdateId,immediateOnly=false}={})=>mutate(tx=>{
+  leaseNext:(workerId,leaseMs=30000,{sourceUpdateId,immediateOnly=false,allowCare=true}={})=>mutate(tx=>{
    const state=tx.raw,now=tx.now,selectedSource=sourceUpdateId===undefined?null:String(sourceUpdateId),items=Object.values(state.outbox),ceilings=new Map();
    // Include preceding immediate replies for these same recipients. Otherwise an
    // old conversation reply would block a new click until the background worker.
    if(selectedSource!==null)for(const item of items)if(item.sourceUpdateId===selectedSource&&!BACKGROUND_KINDS.has(item.kind))ceilings.set(item.recipient,Math.max(ceilings.get(item.recipient)||0,item.sequence));
    const eligible=item=>{
+    if(!allowCare&&['reminder','checkin'].includes(item.kind))return false;
     if(item.state!=='queued'||item.notBefore>now||(state.recipientBlockedUntil[item.recipient]||0)>now)return false;
     if(selectedSource!==null){
      if(immediateOnly&&BACKGROUND_KINDS.has(item.kind))return false;
@@ -127,7 +168,7 @@ function createStore({readSnapshot,commitSnapshot,clock,maxBytes=BOT_MAX_STATE_B
     const active=items.some(other=>other.recipient===item.recipient&&other.id!==item.id&&['leased','sending'].includes(other.state));
     // A queued reminder must not hold up an interactive reply. Active delivery
     // locks and Telegram rate-limit blocks still apply to the entire recipient.
-    const olderDue=items.some(other=>other.recipient===item.recipient&&other.id!==item.id&&other.sequence<item.sequence&&other.state==='queued'&&other.notBefore<=now&&!(selectedSource!==null&&immediateOnly&&BACKGROUND_KINDS.has(other.kind)));
+    const olderDue=items.some(other=>other.recipient===item.recipient&&other.id!==item.id&&other.sequence<item.sequence&&other.state==='queued'&&other.notBefore<=now&&(allowCare||!['reminder','checkin'].includes(other.kind))&&!(selectedSource!==null&&immediateOnly&&BACKGROUND_KINDS.has(other.kind)));
     if(active||olderDue)continue;
     item.state='leased';item.attempts++;item.lease={workerId:String(workerId),fence:tx.newToken(20),until:now+leaseMs};return clone(item);
    }
@@ -135,8 +176,8 @@ function createStore({readSnapshot,commitSnapshot,clock,maxBytes=BOT_MAX_STATE_B
   }),
   hasPendingImmediateForUpdate:async updateId=>{const state=normalized((await readSnapshot()).state),source=String(updateId);pruneState(state,clock());return Object.values(state.outbox).some(item=>item.sourceUpdateId===source&&!BACKGROUND_KINDS.has(item.kind)&&['queued','leased','sending'].includes(item.state));},
   hasPendingCleanupForUpdate:async updateId=>{const state=normalized((await readSnapshot()).state),source=String(updateId);pruneState(state,clock());return Object.values(state.outbox).some(item=>item.sourceUpdateId===source&&item.kind==='interface-cleanup'&&['queued','leased','sending'].includes(item.state));},
-  beginDelivery:(itemId,fence,leaseMs=30000)=>mutate(tx=>{const item=tx.raw.outbox[String(itemId)];if(!item||item.state!=='leased'||item.lease?.fence!==fence||item.lease.until<=tx.now)return undefined;const blockedUntil=tx.raw.recipientBlockedUntil[item.recipient]||0;if(blockedUntil>tx.now){item.state='queued';item.notBefore=Math.max(item.notBefore,blockedUntil);item.lease=null;return undefined;}if(item.kind==='reminder'){const req=tx.getRequest(item.meta?.requestId),appointment=req?.appointment;if(!req||req.status!=='confirmed'||!req.reminders?.enabled||req.clientChatId!==item.recipient||req.appointmentRevision!==item.meta?.appointmentRevision||appointment!==item.meta?.appointment||!Number.isFinite(appointment)||tx.now>=appointment){item.state='cancelled';item.lease=null;return undefined;}const allowedAt=nextAllowedReminderTime(tx.now,appointment);if(allowedAt===null){item.state='cancelled';item.lease=null;return undefined;}if(allowedAt>tx.now){item.state='queued';item.notBefore=allowedAt;item.lease=null;return undefined;}}item.state='sending';item.lease.until=tx.now+leaseMs;return clone(item);}),
-  finishDelivery:(itemId,fence,result)=>mutate(tx=>{const item=tx.raw.outbox[String(itemId)];if(!item||item.state!=='sending'||item.lease?.fence!==fence)return false;if(result.state==='deferred'){item.state='queued';item.notBefore=tx.now+result.retryAfter*1000;tx.raw.recipientBlockedUntil[item.recipient]=item.notBefore;item.lease=null;return true;}item.state=result.state;item.messageId=result.messageId;item.finishedAt=tx.now;item.lease=null;return true;}),
+  beginDelivery:(itemId,fence,leaseMs=30000)=>mutate(tx=>{const item=tx.raw.outbox[String(itemId)];if(!item||item.state!=='leased'||item.lease?.fence!==fence||item.lease.until<=tx.now)return undefined;const blockedUntil=tx.raw.recipientBlockedUntil[item.recipient]||0;if(blockedUntil>tx.now){item.state='queued';item.notBefore=Math.max(item.notBefore,blockedUntil);item.lease=null;return undefined;}if(item.meta?.safeAfterClose&&tx.getTicket(item.meta.ticketId)?.status!=='OPEN'){item.meta.reply_markup={inline_keyboard:[]};item.meta.contactCard=false;}if(item.meta?.requireOpen&&tx.getTicket(item.meta.ticketId)?.status!=='OPEN'){item.state='cancelled';item.lease=null;return undefined;}if(item.kind==='reminder'){const req=tx.getRequest(item.meta?.requestId),appointment=req?.appointment;if(!req||req.status!=='confirmed'||!req.reminders?.enabled||req.clientChatId!==item.recipient||req.appointmentRevision!==item.meta?.appointmentRevision||appointment!==item.meta?.appointment||!Number.isFinite(appointment)||tx.now>=appointment){item.state='cancelled';item.lease=null;return undefined;}const allowedAt=nextAllowedReminderTime(tx.now,appointment);if(allowedAt===null){item.state='cancelled';item.lease=null;return undefined;}if(allowedAt>tx.now){item.state='queued';item.notBefore=allowedAt;item.lease=null;return undefined;}}item.state='sending';item.lease.until=tx.now+leaseMs;return clone(item);}),
+  finishDelivery:(itemId,fence,result)=>mutate(tx=>{const item=tx.raw.outbox[String(itemId)];if(!item||item.state!=='sending'||item.lease?.fence!==fence)return false;if(result.state==='deferred'){item.state='queued';item.notBefore=tx.now+result.retryAfter*1000;tx.raw.recipientBlockedUntil[item.recipient]=item.notBefore;item.lease=null;return true;}item.state=result.state;item.messageId=result.messageId;item.finishedAt=tx.now;item.lease=null;contactFeedback(tx.raw,item,result,tx.now);return true;}),
   inspect:async()=>normalized((await readSnapshot()).state)
  };
 }

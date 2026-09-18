@@ -6,6 +6,8 @@ import {legal} from '../src/data.js';
 
 const env={
  BOT_ENABLED:'true',BOT_WEBHOOK_ENABLED:'true',BOT_WORKER_ENABLED:'true',
+ // This UI test intentionally enables the retained FUTURE reminder capability.
+ BOT_REMINDERS_ENABLED:'true',
  PUBLIC_ORIGIN:'https://example.test',TELEGRAM_WEBHOOK_SECRET:'h'.repeat(32),
  TELEGRAM_WORKER_SECRET:'w'.repeat(32),TELEGRAM_BOT_TOKEN:'test-token',
  TELEGRAM_STAFF_USER_IDS:'55',TELEGRAM_STAFF_CHAT_ID:'-10099',TELEGRAM_SEND_TIMEOUT_MS:'250',

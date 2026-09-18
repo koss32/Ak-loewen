@@ -4,7 +4,8 @@ import {createMemoryBotStore} from '../server/bot-store.js';
 import {createTelegramBot} from '../server/telegram-bot.js';
 import {contacts,legal} from '../src/data.js';
 
-const cfg={deliveryReady:true,sourceLegalStatus:'published',privacyUrl:'https://example.test/privacy',privacyStatus:'published',consentVersion:legal.consentVersion,staffUserIds:['55'],staffChatId:'99'};
+// These tests intentionally enable the retained FUTURE reminder capability.
+const cfg={deliveryReady:true,remindersEnabled:true,sourceLegalStatus:'published',privacyUrl:'https://example.test/privacy',privacyStatus:'published',consentVersion:legal.consentVersion,staffUserIds:['55'],staffChatId:'-10099'};
 const msg=(id,chat,text,user=chat,type='private')=>({update_id:id,message:{chat:{id:chat,type},from:{id:user},text}});
 const cb=(id,chat,data,user=chat,type='private')=>({update_id:id,callback_query:{id:`q${id}`,from:{id:user},data,message:{chat:{id:chat,type}}}});
 const sent=state=>Object.values(state.outbox).filter(item=>item.method==='sendMessage');
@@ -30,11 +31,11 @@ async function bookWithOptIn(store,bot){
  return id;
 }
 async function confirm(store,bot,id,requestId){
- await bot.handle(msg(id++,99,`/staff ${requestId}`,55,'group'));
+ await bot.handle(msg(id++,-10099,`/staff ${requestId}`,55,'group'));
  const card=sent(await store.inspect()).filter(item=>item.kind==='staff-card').at(-1);
  const trainingButton=card.meta.reply_markup.inline_keyboard.flat().find(button=>/Training (bestätigen|ändern)/.test(button.text));
- await bot.handle(cb(id++,99,trainingButton.callback_data,55,'group'));
- await bot.handle(cb(id,99,await button(store,'Montag, Mittwoch, Freitag · 18:30–20:00 · Europe/Berlin'),55,'group'));
+ await bot.handle(cb(id++,-10099,trainingButton.callback_data,55,'group'));
+ await bot.handle(cb(id,-10099,await button(store,'Montag, Mittwoch, Freitag · 18:30–20:00 · Europe/Berlin'),55,'group'));
 }
 
 test('explicit opt-in schedules one two-hour reminder and confirmation includes cancel, disable, and map controls',async()=>{
