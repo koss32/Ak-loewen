@@ -170,7 +170,8 @@ export async function drainTelegramOutbox({store,token,workerId='worker',fetchIm
    let body;try{body=await response.json();}catch{body=null;}
    result=classifyTelegramResponse(response,body,method);
   }catch{result={state:'uncertain'};}
-  await store.finishDelivery(item.id,item.lease.fence,result);
+  const finished=await store.finishDelivery(item.id,item.lease.fence,result);
+  if(finished?.cleanup&&typeof onUiCleanup==='function')try{onUiCleanup(finished.cleanup);}catch{/* cleanup collection is cosmetic */}
   count++;
  }
  return count;
