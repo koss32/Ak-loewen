@@ -24,7 +24,6 @@ function telegramUiStore(store){
     const enqueue=tx.enqueue.bind(tx),view=Object.create(tx);
     view.enqueue=(recipient,text,kind='message',notBefore=tx.now,meta={},method='sendMessage',payload)=>{
      let nextText=text,nextNotBefore=notBefore,nextMeta=meta;
-     if(kind==='interface-cleanup')nextNotBefore=tx.now+1000;
      if(kind==='message'&&typeof nextText==='string'){
       const prompt=[...cancelPrompts].find(value=>nextText===value||nextText.startsWith(`${value}\n`));
       if(prompt)nextText=prompt;
@@ -88,15 +87,11 @@ export function createBotRuntime(env=process.env,{store,fetchImpl=fetch}={}){
    if(!isValidTelegramTimeout(timeoutMs))fail('BOT_TIMEOUT_INVALID');
    const limit=options.limit===undefined?50:positiveInteger(options.limit,'BOT_DRAIN_LIMIT_INVALID',{max:1000});
    const maxDurationMs=options.maxDurationMs===undefined?25000:positiveInteger(options.maxDurationMs,'BOT_DRAIN_BUDGET_INVALID',{min:250,max:29000});
-   return drainTelegramOutbox({store:activeStore,token,fetchImpl,timeoutMs,limit,maxDurationMs,monotonicNow:options.monotonicNow,sourceUpdateId:options.sourceUpdateId,includeBackground:Boolean(options.includeBackground),allowCare:checked.remindersEnabled});
+   return drainTelegramOutbox({store:activeStore,token,fetchImpl,timeoutMs,limit,maxDurationMs,monotonicNow:options.monotonicNow,sourceUpdateId:options.sourceUpdateId,includeBackground:Boolean(options.includeBackground),allowCare:checked.remindersEnabled,onUiCleanup:options.onUiCleanup});
   },
   hasPendingImmediateForUpdate(updateId){
    if(typeof activeStore.hasPendingImmediateForUpdate!=='function')fail('BOT_STORE_CAPABILITY_MISSING');
    return activeStore.hasPendingImmediateForUpdate(updateId);
-  },
-  hasPendingCleanupForUpdate(updateId){
-   if(typeof activeStore.hasPendingCleanupForUpdate!=='function')fail('BOT_STORE_CAPABILITY_MISSING');
-   return activeStore.hasPendingCleanupForUpdate(updateId);
   }
  };
 }
