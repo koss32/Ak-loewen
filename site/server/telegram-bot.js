@@ -142,7 +142,7 @@ export function createTelegramBot({store,config={},verifyStaffMembership=async()
  return {handle,formatAppointment:dateFormat,infoOnly:!bookingReady(cfg)};
 }
 
-export async function drainTelegramOutbox({store,token,workerId='worker',fetchImpl=fetch,limit=50,timeoutMs=8000,maxDurationMs=15000,monotonicNow=()=>performance.now(),sourceUpdateId,includeBackground=false,allowCare=true}={}){
+export async function drainTelegramOutbox({store,token,workerId='worker',fetchImpl=fetch,limit=50,timeoutMs=8000,maxDurationMs=15000,monotonicNow=()=>performance.now(),sourceUpdateId,includeBackground=false,allowCare=true,onUiCleanup}={}){
  if(!store||typeof store.leaseNext!=='function')throw new Error('Telegram store missing');
  if(!token)throw new Error('Telegram token missing');
  if(!Number.isInteger(limit)||limit<1)throw new Error('Telegram drain limit invalid');
