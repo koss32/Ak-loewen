@@ -10,7 +10,7 @@ export const BOT_CALLBACK_TTL_MS=15*1000;
 // may recover it. This prevents a concurrent worker invocation from stealing a
 // current Telegram click while retaining a bounded recovery path.
 export const BOT_INTERACTIVE_DISPATCH_GRACE_MS=30*1000;
-const BACKGROUND_KINDS=new Set(['reminder','checkin','interface-cleanup']);
+const BACKGROUND_KINDS=new Set(['reminder','checkin']);
 const clone=value=>value===undefined?undefined:structuredClone(value);
 const freshState=()=>({schema:2,sessions:{},requests:{},requestSequence:0,tickets:{},ticketSequence:0,clients:{},updates:{},actions:{},outbox:{},recipientSequence:{},recipientBlockedUntil:{}});
 const id=()=>randomUUID().replaceAll('-','');
@@ -42,20 +42,19 @@ export function classifyTelegramResponse(response,body,method='sendMessage'){
 
 // Telegram has no idempotency key for sendMessage. Uncertain sends are terminal,
 // not automatically retried. Durable feedback makes this visible to the sender.
-function trackDisposableUi(state,item,result,now){
- if(result.state!=='sent'||item.method!=='sendMessage'||!item.meta?.privateUi||!(item.meta?.disposableUi||item.meta?.supersedesDisposableUi))return;
+function trackDisposableUi(state,item,result){
+ if(result.state!=='sent'||item.method!=='sendMessage'||!item.meta?.privateUi||!(item.meta?.disposableUi||item.meta?.supersedesDisposableUi))return null;
  const messageId=result.messageId,recipient=String(item.recipient);
- // Only client private chats are tagged at enqueue time. Recheck the positive
- // numeric identity and an existing client record before any delete is queued.
- if(!Number.isSafeInteger(messageId)||messageId<1||!/^\d+$/.test(recipient)||!Number.isSafeInteger(Number(recipient))||Number(recipient)<1)return;
- const client=state.clients[recipient];if(!client)return;
+ // Keep only the current disposable card in durable state. The previous card
+ // is returned to the webhook for direct best-effort deletion and is never
+ // persisted as background work.
+ if(!Number.isSafeInteger(messageId)||messageId<1||!/^\d+$/.test(recipient)||!Number.isSafeInteger(Number(recipient))||Number(recipient)<1)return null;
+ const client=state.clients[recipient];if(!client)return null;
  const previous=client.disposableUiMessageId;
- if(Number.isSafeInteger(previous)&&previous>0&&previous!==messageId){
-  const tx=txFacade(state,{now,updateId:item.sourceUpdateId??null,nonce:'cleanup:'+item.id});
-  tx.enqueue(recipient,'','interface-cleanup',now+1000,{privateUi:true,trackedDisposableCleanup:true},'deleteMessage',{chat_id:recipient,message_id:previous});
- }
+ const cleanup=Number.isSafeInteger(previous)&&previous>0&&previous!==messageId?{chatId:recipient,messageId:previous}:null;
  if(item.meta.disposableUi)client.disposableUiMessageId=messageId;
  else if(item.meta.supersedesDisposableUi)delete client.disposableUiMessageId;
+ return cleanup;
 }
 function contactFeedback(state,item,result,now){
  const feedback=item.meta?.feedback;
@@ -72,6 +71,7 @@ function pruneState(state,now){
  for(const [k,v] of Object.entries(state.tickets||{}))if(v.expiresAt<=now)delete state.tickets[k];
  for(const [k,v] of Object.entries(state.sessions||{}))if(v.value?.ticketId&&!state.tickets[v.value.ticketId])delete state.sessions[k];
  for(const [k,v] of Object.entries(state.outbox||{})){
+  if(v.kind==='interface-cleanup'){delete state.outbox[k];continue;}
   if(v.expiresAt<=now){delete state.outbox[k];continue;}
   if(v.state==='leased'&&v.lease?.until<=now){v.state='queued';v.lease=null;}
   else if(v.state==='sending'&&v.lease?.until<=now){v.state='uncertain';v.finishedAt=now;v.lease=null;contactFeedback(state,v,{state:'uncertain'},now);}
@@ -164,36 +164,34 @@ function createStore({readSnapshot,commitSnapshot,clock,maxBytes=BOT_MAX_STATE_B
   transition:(key,revision,change,notifications=[])=>mutate(tx=>{const result=tx.updateRequest(key,revision,change);if(result.ok)for(const n of notifications)tx.enqueue(n.recipient,n.text,n.kind||'message',n.notBefore||clock(),{requestId:key,...n.meta});return result;}),
   enqueue:(...args)=>mutate(tx=>tx.enqueue(...args)),cancelCare:key=>mutate(tx=>tx.cancelCare(key)),
   leaseNext:(workerId,leaseMs=30000,{sourceUpdateId,immediateOnly=false,allowCare=true}={})=>mutate(tx=>{
-   const state=tx.raw,now=tx.now,selectedSource=sourceUpdateId===undefined?null:String(sourceUpdateId),items=Object.values(state.outbox),ceilings=new Map(),directRecipients=new Set();
+   const state=tx.raw,now=tx.now,selectedSource=sourceUpdateId===undefined?null:String(sourceUpdateId),items=Object.values(state.outbox),ceilings=new Map();
    // Include preceding immediate replies for these same recipients. Otherwise an
    // old conversation reply would block a new click until the background worker.
-   if(selectedSource!==null)for(const item of items)if(item.sourceUpdateId===selectedSource){directRecipients.add(item.recipient);if(!BACKGROUND_KINDS.has(item.kind))ceilings.set(item.recipient,Math.max(ceilings.get(item.recipient)||0,item.sequence));}
+   if(selectedSource!==null)for(const item of items)if(item.sourceUpdateId===selectedSource&&!BACKGROUND_KINDS.has(item.kind))ceilings.set(item.recipient,Math.max(ceilings.get(item.recipient)||0,item.sequence));
    const eligible=item=>{
     if(!allowCare&&['reminder','checkin'].includes(item.kind))return false;
     if(item.state!=='queued'||item.notBefore>now||(state.recipientBlockedUntil[item.recipient]||0)>now)return false;
     if(selectedSource!==null){
      if(immediateOnly&&BACKGROUND_KINDS.has(item.kind))return false;
-     return item.sourceUpdateId===selectedSource||(!BACKGROUND_KINDS.has(item.kind)&&item.sequence<=(ceilings.get(item.recipient)||0))||(!immediateOnly&&item.kind==='interface-cleanup'&&directRecipients.has(item.recipient));
+     return item.sourceUpdateId===selectedSource||(!BACKGROUND_KINDS.has(item.kind)&&item.sequence<=(ceilings.get(item.recipient)||0));
     }
     // Give fresh interaction work to its webhook; recover later only on failure.
     return !(item.sourceUpdateId!==undefined&&!BACKGROUND_KINDS.has(item.kind)&&item.createdAt+BOT_INTERACTIVE_DISPATCH_GRACE_MS>now);
    };
-   const backgroundPriority=item=>selectedSource!==null&&!immediateOnly&&item.kind==='interface-cleanup'?(item.sourceUpdateId===selectedSource?0:1):0;
-   const candidates=items.filter(eligible).sort((a,b)=>(a.kind==='callback-answer'?0:1)-(b.kind==='callback-answer'?0:1)||backgroundPriority(a)-backgroundPriority(b)||a.notBefore-b.notBefore||a.sequence-b.sequence||a.createdAt-b.createdAt);
+   const candidates=items.filter(eligible).sort((a,b)=>(a.kind==='callback-answer'?0:1)-(b.kind==='callback-answer'?0:1)||a.notBefore-b.notBefore||a.sequence-b.sequence||a.createdAt-b.createdAt);
    for(const item of candidates){
     const active=items.some(other=>other.recipient===item.recipient&&other.id!==item.id&&['leased','sending'].includes(other.state));
     // A queued reminder must not hold up an interactive reply. Active delivery
     // locks and Telegram rate-limit blocks still apply to the entire recipient.
-    const olderDue=items.some(other=>other.recipient===item.recipient&&other.id!==item.id&&other.sequence<item.sequence&&other.state==='queued'&&other.notBefore<=now&&(allowCare||!['reminder','checkin'].includes(other.kind))&&!(selectedSource!==null&&BACKGROUND_KINDS.has(other.kind)&&other.sourceUpdateId!==selectedSource));
+    const olderDue=items.some(other=>other.recipient===item.recipient&&other.id!==item.id&&other.sequence<item.sequence&&other.state==='queued'&&other.notBefore<=now&&(allowCare||!['reminder','checkin'].includes(other.kind))&&!(selectedSource!==null&&immediateOnly&&BACKGROUND_KINDS.has(other.kind)));
     if(active||olderDue)continue;
     item.state='leased';item.attempts++;item.lease={workerId:String(workerId),fence:tx.newToken(20),until:now+leaseMs};return clone(item);
    }
    return undefined;
   }),
   hasPendingImmediateForUpdate:async updateId=>{const state=normalized((await readSnapshot()).state),source=String(updateId);pruneState(state,clock());return Object.values(state.outbox).some(item=>item.sourceUpdateId===source&&!BACKGROUND_KINDS.has(item.kind)&&['queued','leased','sending'].includes(item.state));},
-  hasPendingCleanupForUpdate:async updateId=>{const state=normalized((await readSnapshot()).state),source=String(updateId);pruneState(state,clock());return Object.values(state.outbox).some(item=>item.sourceUpdateId===source&&item.kind==='interface-cleanup'&&['queued','leased','sending'].includes(item.state));},
   beginDelivery:(itemId,fence,leaseMs=30000)=>mutate(tx=>{const item=tx.raw.outbox[String(itemId)];if(!item||item.state!=='leased'||item.lease?.fence!==fence||item.lease.until<=tx.now)return undefined;const blockedUntil=tx.raw.recipientBlockedUntil[item.recipient]||0;if(blockedUntil>tx.now){item.state='queued';item.notBefore=Math.max(item.notBefore,blockedUntil);item.lease=null;return undefined;}if(item.meta?.safeAfterClose&&tx.getTicket(item.meta.ticketId)?.status!=='OPEN'){item.meta.reply_markup={inline_keyboard:[]};item.meta.contactCard=false;}if(item.meta?.requireOpen&&tx.getTicket(item.meta.ticketId)?.status!=='OPEN'){item.state='cancelled';item.lease=null;return undefined;}if(item.kind==='reminder'){const req=tx.getRequest(item.meta?.requestId),appointment=req?.appointment;if(!req||req.status!=='confirmed'||!req.reminders?.enabled||req.clientChatId!==item.recipient||req.appointmentRevision!==item.meta?.appointmentRevision||appointment!==item.meta?.appointment||!Number.isFinite(appointment)||tx.now>=appointment){item.state='cancelled';item.lease=null;return undefined;}const allowedAt=nextAllowedReminderTime(tx.now,appointment);if(allowedAt===null){item.state='cancelled';item.lease=null;return undefined;}if(allowedAt>tx.now){item.state='queued';item.notBefore=allowedAt;item.lease=null;return undefined;}}item.state='sending';item.lease.until=tx.now+leaseMs;return clone(item);}),
-  finishDelivery:(itemId,fence,result)=>mutate(tx=>{const item=tx.raw.outbox[String(itemId)];if(!item||item.state!=='sending'||item.lease?.fence!==fence)return false;if(result.state==='deferred'){item.state='queued';item.notBefore=tx.now+result.retryAfter*1000;tx.raw.recipientBlockedUntil[item.recipient]=item.notBefore;item.lease=null;return true;}item.state=result.state;item.messageId=result.messageId;item.finishedAt=tx.now;item.lease=null;trackDisposableUi(tx.raw,item,result,tx.now);contactFeedback(tx.raw,item,result,tx.now);return true;}),
+  finishDelivery:(itemId,fence,result)=>mutate(tx=>{const item=tx.raw.outbox[String(itemId)];if(!item||item.state!=='sending'||item.lease?.fence!==fence)return false;if(result.state==='deferred'){item.state='queued';item.notBefore=tx.now+result.retryAfter*1000;tx.raw.recipientBlockedUntil[item.recipient]=item.notBefore;item.lease=null;return {ok:true,cleanup:null};}item.state=result.state;item.messageId=result.messageId;item.finishedAt=tx.now;item.lease=null;const cleanup=trackDisposableUi(tx.raw,item,result);contactFeedback(tx.raw,item,result,tx.now);return {ok:true,cleanup};}),
   inspect:async()=>normalized((await readSnapshot()).state)
  };
 }
