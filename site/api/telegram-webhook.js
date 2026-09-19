@@ -42,7 +42,7 @@ export function telegramUpdateKind(update){
 }
 export function validTelegramUpdate(update){return telegramUpdateKind(update)!=='invalid';}
 
-export function createWebhookHandler({env=process.env,createRuntime=createBotRuntime,sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms)),waitUntilTask=waitUntil}={}){
+export function createWebhookHandler({env=process.env,createRuntime=createBotRuntime,sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms)),waitUntilTask=waitUntil,fetchImpl=fetch}={}){
  return async function handler(req,res){
   if(req.method!=='POST')return json(res,405,{ok:false,code:'method'});
   const checked=assessBotConfig(env,{requireEnabled:true,requireWebhook:true,requireRedis:false});
@@ -59,22 +59,30 @@ export function createWebhookHandler({env=process.env,createRuntime=createBotRun
    const runtime=createRuntime(env);
    const result=await runtime.bot.handle(update);
    if(result?.ok===false)return json(res,400,result);
-   // The durable reducer has tagged this update's output. Drain only that
-   // immediate work now: callback ACK plus client/staff replies, never global
-   // backlog or scheduled care. A 25s dispatch window leaves serverless
-   // headroom under Vercel's 30s cap and permits more than one 2s request.
+   // Drain only this update's immediate replies. UI deletion is intentionally
+   // not durable work: the webhook collects the previous private card and sends
+   // deleteMessage directly in waitUntil, like the fast Release 4 flow.
    try{
-    await runtime.drain({limit:10,maxDurationMs:WEBHOOK_DRAIN_BUDGET_MS,sourceUpdateId:update.update_id});
+    const cleanupTargets=[];
+    if(kind==='callback'){
+     const message=update.callback_query?.message,user=update.callback_query?.from;
+     if(message?.chat?.type==='private'&&message.chat.id===user?.id&&Number.isSafeInteger(message.message_id)&&message.message_id>0)cleanupTargets.push({chatId:String(message.chat.id),messageId:message.message_id});
+    }
+    await runtime.drain({limit:10,maxDurationMs:WEBHOOK_DRAIN_BUDGET_MS,sourceUpdateId:update.update_id,onUiCleanup:target=>cleanupTargets.push(target)});
     if(await runtime.hasPendingImmediateForUpdate(update.update_id))return json(res,503,{ok:false,code:'retry'});
-    // Cleanup is deliberately delayed so Telegram users can see the transition.
-    // Run it inside this webhook invocation instead of relying on post-response
-    // waitUntil: worker/reminders stay disabled in Production, so otherwise a
-    // queued cosmetic delete may never be picked up.
-    if(typeof runtime.hasPendingCleanupForUpdate==='function'&&await runtime.hasPendingCleanupForUpdate(update.update_id)){
-     try{
-      await sleep(INTERFACE_CLEANUP_DELAY_MS);
-      await runtime.drain({limit:50,timeoutMs:1500,maxDurationMs:8000,sourceUpdateId:update.update_id,includeBackground:true});
-     }catch{/* cosmetic cleanup must never make Telegram retry the whole update */}
+    if(cleanupTargets.length){
+     const cleanupTask=(async()=>{
+      try{await sleep(INTERFACE_CLEANUP_DELAY_MS);}catch{return;}
+      const seen=new Set(),token=String(env.TELEGRAM_BOT_TOKEN||'').trim();
+      if(!token)return;
+      for(const target of cleanupTargets){
+       const chatId=String(target?.chatId||''),messageId=Number(target?.messageId),key=chatId+':'+messageId;
+       if(!/^\d+$/.test(chatId)||!Number.isSafeInteger(messageId)||messageId<1||seen.has(key))continue;
+       seen.add(key);
+       try{await fetchImpl(`https://api.telegram.org/bot${token}/deleteMessage`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({chat_id:chatId,message_id:messageId}),signal:AbortSignal.timeout(2500)});}catch{/* cosmetic deletion never affects the update */}
+      }
+     })();
+     try{waitUntilTask(cleanupTask);}catch{cleanupTask.catch(()=>{});}
     }
    }catch{return json(res,503,{ok:false,code:'retry'});}
    return json(res,200,{ok:true,dropped:Boolean(result?.dropped)});
