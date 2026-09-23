@@ -5,7 +5,7 @@ import {legal} from '../src/data.js';
 // Ops are deliberately bound to the current release branch and to an explicit
 // Vercel Preview deployment. No origin is trusted merely because it is present
 // in an arbitrary environment variable.
-const PREVIEW_BRANCH='release-6';
+const PREVIEW_BRANCH='release-7';
 const EXPECTED_BOT_USERNAME='ak_loewenbot';
 const EXPECTED_PRIVACY={status:legal.publicationStatus,consentVersion:legal.consentVersion,path:'/telegram-privacy/'};
 const WEBHOOK_PATH='/api/telegram-webhook/';

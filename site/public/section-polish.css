@@ -322,3 +322,94 @@
   #kontakt .contact-link strong { transform: none !important; transition: none !important; }
   .polish-sheen { display: none; }
 }
+
+/* Membership follows the rounded dark surfaces used by nearby sections. */
+#preise { background: transparent; color: var(--ink); }
+#preise p, #preise .micro { color: var(--ink-2); }
+#preise .section-head { display: block; margin-bottom: 24px; }
+#preise .section-head::after { content: none; }
+#preise .section-head h2 {
+  max-width: 17ch;
+  color: var(--ink);
+  font-size: clamp(38px,4.2vw,58px);
+  line-height: 1.08;
+  letter-spacing: 0;
+  text-transform: none;
+}
+#preise .section-intro { margin: 0 0 30px; }
+#preise .price-list {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 20px;
+  border: 0;
+}
+#preise .price-card {
+  min-width: 0;
+  min-height: 320px;
+  padding: 30px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 18px 42px #00000020;
+}
+#preise .price-card:first-child {
+  background: #9b3d1d;
+  border-color: #f1783e;
+  color: #fffaf4;
+}
+#preise .price-card:last-child {
+  background: #9b3d1d;
+  border-color: #f1783e;
+  color: #fffaf4;
+}
+#preise .price-card.b {
+  background: var(--b-bg);
+  border-color: #f4cc4652;
+  color: var(--b-ink);
+}
+#preise .price-card h3 { font-size: clamp(26px,2.5vw,34px); margin-bottom: 34px; }
+#preise .price-card .amount {
+  font-size: clamp(62px,6vw,84px);
+  line-height: 1;
+  letter-spacing: 0;
+}
+#preise .price-card .amount span { font-size: .48em; margin-left: 5px; }
+#preise .price-card p:not(.amount) { opacity: 1; color: var(--ink-2); }
+#preise .price-card:first-child p:not(.amount),
+#preise .price-card:last-child p:not(.amount) { color: #ffe0c8; }
+#preise .price-card.b p:not(.amount) { color: #d3e0ed; }
+#preise .price-card .tlink { margin-top: auto; padding-top: 12px; color: inherit; border-color: var(--accent); }
+#preise .price-card.b .tlink { border-color: var(--b-accent); }
+#preise .trial-line {
+  width: 100%;
+  max-width: none;
+  margin-top: 24px;
+  padding: 12px 18px;
+  border: 1px solid color-mix(in srgb,var(--accent) 45%,var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb,var(--accent) 12%,var(--surface));
+  color: var(--ink);
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+}
+@media(max-width:900px) {
+  #preise .price-list { grid-template-columns: 1fr; }
+  #preise .price-card { min-height: 0; padding: 26px; }
+}
+@media(max-width:540px) {
+  #preise .section-head h2 { font-size: clamp(36px,10vw,48px); }
+  #preise .price-list { gap: 14px; }
+  #preise .price-card { border-radius: 20px; padding: 24px; }
+  #preise .price-card h3 { margin-bottom: 20px; }
+  #preise .price-card .amount { font-size: 68px; }
+  #preise .trial-line { margin-top: 18px; }
+}
+[data-theme="light"] #preise { background: transparent; }
+[data-theme="light"] #preise .price-card:not(.b) { color: #fff7f1; }
+[data-theme="light"] #preise .price-card:first-child,
+[data-theme="light"] #preise .price-card:last-child { background: #9b3d1d; }
+[data-theme="light"] #preise .price-card:first-child p:not(.amount),
+[data-theme="light"] #preise .price-card:last-child p:not(.amount) { color: #ffe0c8; }
+[data-theme="light"] #preise .price-card.b p:not(.amount) { color: #d3e0ed; }

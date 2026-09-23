@@ -1,6 +1,6 @@
 # AK-LOEWEN
 
-> **Текущая рабочая ветка — `release-6`; исходники — `site/`.** Перед каждой задачей сверяйте HEAD удалённой ветки. Последняя проверка GitHub 23.09.2026: `a77a4cc464c1f1aec3604d3a262e139447bc7bb0`. Статус проверок и Production смотрите в [RELEASE-6.md](docs/releases/RELEASE-6.md); старые отчёты не подтверждают более поздние коммиты.
+> **Текущая рабочая ветка — `release-7`; исходники — `site/`.** Релиз 7 продолжает `release-6`. Перед работой сверяйте удалённый HEAD, а статус публикации — в [RELEASE-7.md](docs/releases/RELEASE-7.md).
 
 Один репозиторий = один проект **AK-LOEWEN**: локализованный лендинг и legal-страницы, web-форма/API и Telegram booking/status/contact со staff flow. Telegram не является отдельным продуктом и не имеет отдельной нумерации.
 
@@ -11,12 +11,13 @@
 | Release 2 | исторический утверждённый baseline | `release-2` | landing |
 | Release 3 | исторический Preview/WIP | `release-3` | не текущий source of truth |
 | Release 5 | стабильный baseline | `release-5` | неизменный, SHA `c52e77dcde8548e00f2e6208b143dc87c37f811e` |
-| **Release 6** | текущая рабочая ветка; степень проверки зависит от коммита | `release-6` | HEAD сверять с GitHub; `f5c3660` — исторический проверенный кандидат, не текущий HEAD |
+| Release 6 | предыдущая рабочая ветка | `release-6` | исторические проверки относятся к конкретным коммитам |
+| **Release 7** | текущая рабочая ветка | `release-7` | содержит последние правки сайта и Telegram-ссылок |
 
 ## Быстрый маршрут
 
-1. Ограничения, результаты и cloud blockers: [`docs/releases/RELEASE-6-CONTINUATION.md`](docs/releases/RELEASE-6-CONTINUATION.md).
-2. Текущий release status: [`docs/releases/RELEASE-6.md`](docs/releases/RELEASE-6.md).
+1. Текущий release status: [`docs/releases/RELEASE-7.md`](docs/releases/RELEASE-7.md).
+2. Исторические ограничения и проверки Release 6: [`docs/releases/RELEASE-6.md`](docs/releases/RELEASE-6.md).
 3. Будущий безопасный порядок запуска (не разрешение): [`docs/releases/RELEASE-6-LAUNCH-CHECKLIST.md`](docs/releases/RELEASE-6-LAUNCH-CHECKLIST.md).
 4. Карта ownership: [`docs/architecture/AI-MAP.md`](docs/architecture/AI-MAP.md).
 5. Разработка и локальные команды: [`docs/development/README.md`](docs/development/README.md).

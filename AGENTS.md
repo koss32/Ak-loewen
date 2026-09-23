@@ -13,10 +13,10 @@ Telegram — часть приложения, а не отдельный про�
 ## Текущий релиз
 
 - `release-5` — стабильный утверждённый baseline: `c52e77dcde8548e00f2e6208b143dc87c37f811e`.
-- `release-6` — единственная рабочая ветка текущего продолжения. Кандидатный SHA берётся из проверенного HEAD финальной передачи; synthetic SHA не используется.
-- Перед изменениями сверяйте `origin/release-6` с GitHub и отделяйте текущий HEAD от SHA старых проверок. Ветка по умолчанию `Ak-loewen` — навигация, а не исходник текущего лендинга.
+- `release-7` — рабочая ветка текущего продолжения; `release-6` — предыдущий релиз. Кандидатный SHA берётся из проверенного HEAD; synthetic SHA не используется.
+- Перед изменениями сверяйте `origin/release-7` с GitHub и отделяйте текущий HEAD от SHA старых проверок. Ветка по умолчанию `Ak-loewen` — навигация, а не исходник текущего лендинга.
 - `RELEASE-2.md` и `RELEASE-3.md` — исторические записи, не текущий source of truth.
-- Статус, ограничения и доказательства текущего релиза: `docs/releases/RELEASE-6.md`, `RELEASE-6-CONTINUATION.md` и `release-6-evidence/`.
+- Статус текущего релиза: `docs/releases/RELEASE-7.md`. Отчёты `RELEASE-6.md` и `release-6-evidence/` относятся к предыдущему релизу.
 
 Не создавайте отдельные версии для сайта, бота, handoff, preview или подсистем.
 
@@ -41,7 +41,7 @@ Telegram — часть приложения, а не отдельный про�
 - `site/server/` — runtime, validation, Redis, Telegram и form services.
 - `site/server/indexing-config.js` — единая политика indexing/robots/sitemap.
 - `site/middleware.js` — request-time `X-Robots-Tag`, robots и canonical-host gate через Vercel proxy entrypoint.
-- `site/build.js` — очищает и генерирует `dist`, localized/legal pages, robots и standalone Release 6 review artifact.
+- `site/build.js` — очищает и генерирует `dist`, localized/legal pages, robots и standalone Release 7 review artifact.
 - `site/tests/` — тесты всего приложения.
 - `docs/` — текущая документация; `archive/` — только исторический материал; `tools/` — development tools.
 

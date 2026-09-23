@@ -38,11 +38,11 @@ test('HTML robots, normalized canonicals and legal locale pages share explicit i
 test('runtime headers cannot index Preview, noncanonical hosts, APIs, privacy or standalone artifacts',()=>{
  for(const env of [{},{...production,VERCEL_ENV:'preview'},{...production,VERCEL_TARGET_ENV:'staging'}]){
   const middleware=createIndexingMiddleware(env);
-  for(const path of ['/','/de/','/api/trial-requests','/telegram-privacy/','/ak-loewen-valset-release-6.html'])assert.equal(middleware(new Request(`https://ak.example${path}`)).headers.get('x-robots-tag'),NOINDEX);
+  for(const path of ['/','/de/','/api/trial-requests','/telegram-privacy/','/ak-loewen-valset-release-7.html'])assert.equal(middleware(new Request(`https://ak.example${path}`)).headers.get('x-robots-tag'),NOINDEX);
  }
  const middleware=createIndexingMiddleware(production);
  for(const path of ['/','/ru/','/tr/impressum/','/uk/datenschutz/'])assert.equal(middleware(new Request(`https://ak.example${path}`)).headers.get('x-robots-tag'),INDEX);
- for(const path of ['/api/telegram-webhook/','/telegram-privacy/','/ak-loewen-valset-release-6.html','/unknown/'])assert.equal(middleware(new Request(`https://ak.example${path}`)).headers.get('x-robots-tag'),NOINDEX);
+ for(const path of ['/api/telegram-webhook/','/telegram-privacy/','/ak-loewen-valset-release-7.html','/unknown/'])assert.equal(middleware(new Request(`https://ak.example${path}`)).headers.get('x-robots-tag'),NOINDEX);
  assert.equal(middleware(new Request('https://deployment.vercel.app/de/')).headers.get('x-robots-tag'),NOINDEX);
 });
 
@@ -65,11 +65,11 @@ test('fresh builds align robots, sitemap, HTML, review artifact and fail closed 
  const fixture=await mkdtemp(join(tmpdir(),'ak-indexing-build-'));
  try{
   await cp(root,fixture,{recursive:true,filter:source=>!['node_modules','dist','.state','.git'].includes(basename(source))});
-  await symlink(resolve(root,'node_modules'),join(fixture,'node_modules'),'dir');
+  await symlink(resolve(root,'node_modules'),join(fixture,'node_modules'),process.platform==='win32'?'junction':'dir');
   const env={PATH:process.env.PATH,HOME:process.env.HOME,TMPDIR:process.env.TMPDIR};
   const build=extra=>spawnSync(process.execPath,['build.js'],{cwd:fixture,env:{...env,...extra},encoding:'utf8',timeout:60000});
   let result=build({});assert.equal(result.status,0,result.stderr);assert.equal(await readFile(join(fixture,'dist/robots.txt'),'utf8'),'User-agent: *\nDisallow: /\n');await assert.rejects(readFile(join(fixture,'dist/sitemap.xml')));
-  result=build(production);assert.equal(result.status,0,result.stderr);assert.match(await readFile(join(fixture,'dist/de/index.html'),'utf8'),/content="index,follow"/);assert.match(await readFile(join(fixture,'dist/sitemap.xml'),'utf8'),/<urlset/);assert.match(await readFile(join(fixture,'dist/ak-loewen-valset-release-6.html'),'utf8'),/content="noindex,nofollow"/);
+  result=build(production);assert.equal(result.status,0,result.stderr);assert.match(await readFile(join(fixture,'dist/de/index.html'),'utf8'),/content="index,follow"/);assert.match(await readFile(join(fixture,'dist/sitemap.xml'),'utf8'),/<urlset/);assert.match(await readFile(join(fixture,'dist/ak-loewen-valset-release-7.html'),'utf8'),/content="noindex,nofollow"/);
   result=build({...production,VERCEL_ENV:'preview'});assert.equal(result.status,0,result.stderr);assert.match(await readFile(join(fixture,'dist/de/index.html'),'utf8'),/content="noindex,nofollow"/);await assert.rejects(readFile(join(fixture,'dist/sitemap.xml')));
   result=build({FORM_DELIVERY_ENABLED:'true'});assert.notEqual(result.status,0);assert.match(result.stderr,/Form delivery requested but not ready/);
  }finally{await rm(fixture,{recursive:true,force:true});}

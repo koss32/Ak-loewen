@@ -76,8 +76,8 @@ test('booking, confirmation and status work with worker/reminders disabled',asyn
  // Select actions by their domain values rather than translated labels.
  await f.say(10,'/book');
  const choose=async(type,value)=>{const state=await f.store.inspect(),found=Object.entries(state.actions).filter(([,a])=>a.type===type&&(value===undefined||a.value===value)).at(-1);assert.ok(found);await f.click(10,`a:${found[0]}`);};
- await choose('program','boxen');await choose('group','box-15');await choose('consent');await choose('type','adult');
- await f.say(10,'+49 151 1234567');await f.say(10,'Adult Participant');await f.say(10,'25');await choose('schedule','box-week');await f.say(10,'/skip');
+ await choose('program','boxen');await choose('group','box-15');await choose('consent');
+ await f.say(10,'+49 151 1234567');await choose('comment-skip');
  const preview=f.sends(10).at(-1).body.reply_markup.inline_keyboard.flat();assert.equal(preview.length,1);assert.equal(preview[0].text,botCopy.de.submit);
  await f.click(10,preview[0].callback_data);
  const request=Object.values((await f.store.inspect()).requests)[0];assert.ok(request);assert.equal(request.reminders.enabled,false);

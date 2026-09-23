@@ -23,7 +23,7 @@ function fixture(){
  const bot=createTelegramBot({store,config:cfg,verifyStaffMembership:async()=>true});
  const message=(text,user={id:10,first_name:'  Alice\u0000 ',last_name:'\nSmith ',username:'not-a-name'},chat=user.id,type='private')=>({update_id:++id,message:{message_id:900+id,chat:{id:chat,type},from:user,text}});
  const callback=(data,user={id:10,first_name:'Alice',last_name:'Smith'},chat=user.id,type='private',message_id=777)=>({update_id:++id,callback_query:{id:`q${id}`,from:user,data,message:{message_id,chat:{id:chat,type}}}});
- const apply=async update=>{await bot.handle(update);await drainTelegramOutbox({store,token:'test',fetchImpl:transport,sourceUpdateId:update.update_id,limit:30,timeoutMs:250,maxDurationMs:5000});};
+ const apply=async(update,onUiCleanup)=>{await bot.handle(update);await drainTelegramOutbox({store,token:'test',fetchImpl:transport,sourceUpdateId:update.update_id,limit:30,timeoutMs:250,maxDurationMs:5000,onUiCleanup});};
  const action=async type=>{const entry=Object.entries((await store.inspect()).actions).filter(([,value])=>value.type===type).at(-1);assert.ok(entry,`missing ${type}`);return `a:${entry[0]}`;};
  return {store,calls,message,callback,apply,action,advance:ms=>{now+=ms;},failNext:()=>{failNext=true;}};
 }
@@ -34,10 +34,11 @@ test('webhook waitUntil cleans the prior tracked UI without enabling worker or r
  let now=Date.now(),messageId=100;const calls=[],tasks=[],sleeps=[];
  const store=createMemoryBotStore({clock:()=>now});
  const env={BOT_ENABLED:'true',BOT_WEBHOOK_ENABLED:'true',BOT_WORKER_ENABLED:'false',BOT_REMINDERS_ENABLED:'false',PUBLIC_ORIGIN:'https://example.test',TELEGRAM_WEBHOOK_SECRET:'h'.repeat(32),TELEGRAM_BOT_TOKEN:'test-token',TELEGRAM_STAFF_USER_IDS:'55',TELEGRAM_STAFF_CHAT_ID:GROUP,TELEGRAM_SEND_TIMEOUT_MS:'250'};
- const handler=createWebhookHandler({env,sleep:async ms=>{sleeps.push(ms);now+=ms;},waitUntilTask:task=>tasks.push(task),createRuntime:runtimeEnv=>createBotRuntime(runtimeEnv,{store,fetchImpl:async(url,options)=>{
+ const transport=async(url,options)=>{
   const method=url.split('/').at(-1),body=JSON.parse(options.body);calls.push({method,body});
   return {status:200,json:async()=>({ok:true,result:method==='sendMessage'?{message_id:++messageId}:true})};
- }})});
+ };
+ const handler=createWebhookHandler({env,sleep:async ms=>{sleeps.push(ms);now+=ms;},waitUntilTask:task=>tasks.push(task),fetchImpl:transport,createRuntime:runtimeEnv=>createBotRuntime(runtimeEnv,{store,fetchImpl:transport})});
  for(const updateId of [1,2]){
   const res={statusCode:0,body:null,setHeader(){},status(code){this.statusCode=code;return this;},json(body){this.body=body;}};
   await handler({method:'POST',headers:{host:'example.test','content-type':'application/json','x-telegram-bot-api-secret-token':env.TELEGRAM_WEBHOOK_SECRET},rawBody:Buffer.from(JSON.stringify({update_id:updateId,message:{message_id:900+updateId,chat:{id:10,type:'private'},from:{id:10,first_name:'TEST'},text:updateId===1?'/start':'/language'}}))},res);
@@ -78,7 +79,8 @@ test('RU booking is group → consent → phone → optional comment → review 
  const reviewId=(await f.store.inspect()).clients['10'].disposableUiMessageId;
  await f.apply(f.callback(await f.action('submit')));
  const submitted=await f.store.inspect();
- assert.ok(Object.values(submitted.outbox).some(item=>item.kind==='interface-cleanup'&&item.payload.message_id===reviewId));
+ assert.ok(reviewId>0);
+ assert.ok(!Object.values(submitted.outbox).some(item=>item.kind==='interface-cleanup'));
  assert.equal(submitted.clients['10'].disposableUiMessageId,undefined,'final confirmation is not disposable');
  const finalIds=Object.values(submitted.outbox).filter(item=>item.state==='sent'&&!item.meta?.disposableUi).map(item=>item.messageId);
  await f.apply(f.message('/start'));
@@ -152,28 +154,23 @@ test('localized senior labels are corrected without changing group IDs',()=>{
  assert.equal(translations.tr.seniorGroup,'Büyük yaş grubu · 9–16 yaş');
 });
 
-test('only successfully delivered, explicitly tracked private UI is cleaned after one second',async()=>{
+test('only successfully delivered private UI exposes the prior card for cleanup',async()=>{
  const f=fixture();
  await f.apply(f.message('/start'));
  const first=sendCalls(f).at(-1).body;
- await f.apply(f.callback('cmd:language',undefined,10,'private',9999));
- const state=await f.store.inspect(),cleanup=Object.values(state.outbox).find(item=>item.kind==='interface-cleanup');
- assert.ok(cleanup);
- assert.equal(cleanup.payload.message_id,101,'uses the successful bot result, not callback.message_id');
- assert.equal(cleanup.notBefore,Date.parse('2026-09-19T10:00:00Z')+1000);
+ const targets=[];const update=f.callback('cmd:language',undefined,10,'private',9999);
+ await f.apply(update,target=>targets.push(target));
+ const state=await f.store.inspect();
+ assert.equal(state.clients['10'].disposableUiMessageId,102);
+ assert.ok(!Object.values(state.outbox).some(item=>item.kind==='interface-cleanup'));
  assert.ok(!f.calls.some(call=>call.method==='deleteMessage'));
- f.advance(999);
- await drainTelegramOutbox({store:f.store,token:'test',fetchImpl:async(url,options)=>{f.calls.push({method:url.split('/').at(-1),body:JSON.parse(options.body)});return {status:200,json:async()=>({ok:true,result:true})};},sourceUpdateId:2,includeBackground:true,limit:10,timeoutMs:250,maxDurationMs:5000});
- assert.ok(!f.calls.some(call=>call.method==='deleteMessage'));
- f.advance(1);
- await drainTelegramOutbox({store:f.store,token:'test',fetchImpl:async(url,options)=>{f.calls.push({method:url.split('/').at(-1),body:JSON.parse(options.body)});return {status:200,json:async()=>({ok:true,result:true})};},sourceUpdateId:2,includeBackground:true,limit:10,timeoutMs:250,maxDurationMs:5000});
- assert.deepEqual(f.calls.filter(call=>call.method==='deleteMessage').map(call=>call.body),[{chat_id:'10',message_id:101}]);
+ assert.deepEqual(targets,[{chatId:'10',messageId:101}]);
  assert.equal(first.chat_id,'10');
  const failed=fixture();
  await failed.apply(failed.message('/start'));
  failed.failNext();
  await failed.apply(failed.callback('cmd:language'));
- assert.equal(Object.values((await failed.store.inspect()).outbox).filter(item=>item.kind==='interface-cleanup').length,0);
+ assert.equal((await failed.store.inspect()).clients['10'].disposableUiMessageId,101);
 });
 
 test('contact prompt is concise and Reply/Close preserve contact and staff history from cleanup',async()=>{

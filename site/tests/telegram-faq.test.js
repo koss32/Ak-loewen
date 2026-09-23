@@ -22,6 +22,15 @@ async function fixture(locale='de',overrides={}){
  return {store,bot:createTelegramBot({store,config:{...config,...overrides}})};
 }
 
+test('website booking start payload opens the booking choices',async()=>{
+ const {store,bot}=await fixture('ru');
+ await bot.handle(message(1,'/start site_booking'));
+ const item=await latest(store);
+ assert.equal(item.text,botCopy.ru.choose);
+ assert.equal((await store.getSession(10)).stage,'program');
+ assert.equal(buttons(item).length,3);
+});
+
 function assertQuestions(item,locale){
  assert.equal(item.text,botCopy[locale].faqTitle);
  assert.deepEqual(buttons(item).map(b=>b.callback_data),[...topics.map(([topic])=>`cmd:faq:${topic}`),'cmd:menu']);

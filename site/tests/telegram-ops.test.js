@@ -3,9 +3,9 @@ import assert from 'node:assert/strict';
 import {runCheck,runWebhook,runWorker,runTelegramOps} from '../server/telegram-ops.js';
 import {spawnSync} from 'node:child_process';
 
-const TOKEN='t'.repeat(40),WEBHOOK_SECRET='h'.repeat(40),WORKER_SECRET='w'.repeat(40),OPS_ORIGIN='https://release-6-preview.example';
+const TOKEN='t'.repeat(40),WEBHOOK_SECRET='h'.repeat(40),WORKER_SECRET='w'.repeat(40),OPS_ORIGIN='https://release-7-preview.example';
 const baseEnv=()=>({
- VERCEL:'1',VERCEL_ENV:'preview',VERCEL_GIT_COMMIT_REF:'release-6',VERCEL_URL:'release-6-preview.example',
+ VERCEL:'1',VERCEL_ENV:'preview',VERCEL_GIT_COMMIT_REF:'release-7',VERCEL_URL:'release-7-preview.example',
  TELEGRAM_OPS_PREVIEW_ORIGIN:OPS_ORIGIN,PUBLIC_ORIGIN:`${OPS_ORIGIN}/`,
  BOT_ENABLED:'true',BOT_WEBHOOK_ENABLED:'true',BOT_WORKER_ENABLED:'true',
  TELEGRAM_BOT_TOKEN:TOKEN,TELEGRAM_BOT_USERNAME:'ak_loewenbot',TELEGRAM_STAFF_USER_IDS:'55,56',TELEGRAM_STAFF_CHAT_ID:'-10099',
@@ -31,9 +31,9 @@ function fakeFetch({setResult=true,botUsername='ak_loewenbot',botIdentity,stateB
   {},
   {...baseEnv(),VERCEL_GIT_COMMIT_REF:'release-3'},
   {...baseEnv(),TELEGRAM_OPS_PREVIEW_ORIGIN:''},
-  {...baseEnv(),TELEGRAM_OPS_PREVIEW_ORIGIN:'https://release-6-preview.example/'},
+  {...baseEnv(),TELEGRAM_OPS_PREVIEW_ORIGIN:'https://release-7-preview.example/'},
   {...baseEnv(),PUBLIC_ORIGIN:'https://other.example'},
-  {...baseEnv(),TELEGRAM_OPS_PREVIEW_ORIGIN:'http://release-6-preview.example'},
+  {...baseEnv(),TELEGRAM_OPS_PREVIEW_ORIGIN:'http://release-7-preview.example'},
   {...baseEnv(),VERCEL_URL:'other.example',VERCEL_BRANCH_URL:''},
   {...baseEnv(),VERCEL_URL:'',VERCEL_BRANCH_URL:''},
   {...baseEnv(),VERCEL_GIT_COMMIT_REF:''},
@@ -44,7 +44,7 @@ function fakeFetch({setResult=true,botUsername='ak_loewenbot',botIdentity,stateB
  }
 });
 
-test('release-6 target matches the verified platform host and check remains read-only',async()=>{
+test('release-7 target matches the verified platform host and check remains read-only',async()=>{
  const calls=[],result=await runCheck({env:baseEnv(),fetchImpl:fakeFetch({calls})});
  assert.equal(result.ok,true);assert.equal(result.preconditions.source_branch,true);assert.equal(result.preconditions.deployment_origin,true);
  assert.equal(calls.some(x=>x.url.includes('/setWebhook')||x.url.includes('/sendMessage')||x.url.includes('/del')),false);

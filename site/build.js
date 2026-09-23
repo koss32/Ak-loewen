@@ -24,5 +24,5 @@ const assets={};for(const name of (await readdir('public/assets')).filter(name=>
 function inline(html){for(const [src,data] of Object.entries(assets))html=html.replaceAll(src,data);return html;}
 standalone=inline(standalone).replace(/<link rel="stylesheet"[^>]+>/g,'').replace(/<script src="[^"]+" defer><\/script>/g,'').replace('</head>',()=>`<style>${css}</style></head>`);
 standalone=standalone.replace('</body>',()=>`<script>window.__AK_PAGES__=${JSON.stringify(pages).replaceAll('<','\\u003c')};window.__AK_ASSETS__=${JSON.stringify(assets)};</script><script>${js.replaceAll('</script','<\\/script')}</script></body>`);
-await writeFile('dist/ak-loewen-valset-release-6.html',standalone);
-console.log('Built Release 6 output: 4 localized pages, legal pages and one standalone file.');
+await writeFile('dist/ak-loewen-valset-release-7.html',standalone);
+console.log('Built Release 7 output: 4 localized pages, legal pages and one standalone file.');

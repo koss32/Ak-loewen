@@ -88,6 +88,13 @@ html{scroll-padding-top:var(--header-offset)}section[id],div[id]{scroll-margin-t
 
 /* ScrollCraft/taste-skill motion: natural document flow, no hidden-content dependency. */
 .trainer-image.is-illustration{overflow:hidden}.trainer-image.is-illustration figcaption{position:relative;z-index:1;background:var(--surface);font-size:10px;line-height:1.5;padding:10px 12px;color:var(--ink-3)}
+
+/* Keep the secondary hero action legible over the animated particle backdrop. */
+.hero .btn.ghost{background:#242326;color:#fff7f0;border:1px solid #e85a22;clip-path:none;border-radius:8px;padding:14px 20px;min-height:50px;box-shadow:0 8px 24px #0008}
+.hero .btn.ghost:hover{background:#353033;border-color:#ff7a3d;color:#fff}
+[data-theme="light"] .hero .btn.ghost{background:#fff8f1;color:#222126;border-color:#c4501e;box-shadow:0 8px 24px #0003}
+[data-theme="light"] .hero .btn.ghost:hover{background:#fff0e3;color:#161519}
+@media(max-width:540px){.hero .btn.ghost{border:1px solid #e85a22;padding:12px 18px;min-height:48px}}
 @keyframes ak-portrait-depth{from{transform:translate3d(0,9px,0) scale(1.07)}to{transform:translate3d(0,-9px,0) scale(1.015)}}
 @keyframes ak-reading-progress{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 @media(prefers-reduced-motion:no-preference){

@@ -100,8 +100,9 @@
  /* 0 = free dust, 1 = the finished mark. The first screen is deliberately pure
   * dust: the lion only earns its shape once the visitor starts reading. */
  function assembly(p) {
-  if (p < .06) return 0;
-  if (p < .34) return smooth(.06, .34, p);
+  const start = mobile ? .18 : .22, end = mobile ? .37 : .46;
+  if (p < start) return 0;
+  if (p < end) return smooth(start, end, p);
   if (p < .58) return 1;
   if (p < .76) return mix(1, .08, smooth(.58, .76, p));
   return mix(.08, 1, smooth(.76, .94, p));

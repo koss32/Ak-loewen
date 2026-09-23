@@ -18,7 +18,7 @@ const env={
 const message=(updateId,text)=>({update_id:updateId,message:{chat:{id:10,type:'private'},from:{id:10},text}});
 const callback=(updateId,data)=>({update_id:updateId,callback_query:{id:`q${updateId}`,from:{id:10},data,message:{message_id:77,chat:{id:10,type:'private'}}}});
 
-test('runtime shows the new reminder label, opens the next card immediately, and cleans the old card after two seconds',async()=>{
+test('runtime shows the new reminder label and opens the cancellation prompt immediately',async()=>{
  const now=Date.parse('2026-09-16T10:00:00Z');
  const store=createMemoryBotStore({clock:()=>now});
  await store.transactUpdate('seed-ui',tx=>{
@@ -38,7 +38,6 @@ test('runtime shows the new reminder label, opens the next card immediately, and
  state=await store.inspect();
  const prompt=Object.values(state.outbox).filter(item=>item.sourceUpdateId==='2'&&item.method==='sendMessage').at(-1);
  assert.equal(prompt.text,'Отменить эту заявку?');
- const cleanup=Object.values(state.outbox).find(item=>item.sourceUpdateId==='2'&&item.kind==='interface-cleanup');
- assert.ok(cleanup);
- assert.equal(cleanup.notBefore,now+2000);
+ assert.ok(!Object.values(state.outbox).some(item=>item.kind==='interface-cleanup'));
+ assert.equal(prompt.kind,'message');
 });

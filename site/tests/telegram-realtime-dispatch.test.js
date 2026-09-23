@@ -32,7 +32,7 @@ test('webhook sends a slow callback ACK and its menu in one source-scoped dispat
   return {status:200,json:async()=>({ok:true,result:method==='answerCallbackQuery'?true:{message_id:deliveries.length}})};
  };
  const handler=createWebhookHandler({env:value,createRuntime:runtimeEnv=>directRuntime(runtimeEnv,store,transport,()=>elapsed)});
- assert.equal(WEBHOOK_DRAIN_BUDGET_MS,25000);
+ assert.equal(WEBHOOK_DRAIN_BUDGET_MS,20000);
  const update=callback(44,'cmd:menu');
  const first=await invoke(handler,update,value);
  assert.equal(first.statusCode,200);
@@ -54,21 +54,20 @@ test('webhook sends a slow callback ACK and its menu in one source-scoped dispat
  assert.ok(deliveries.some(item=>item.body.text==='due care'));
 });
 
-test('a valid button click renders the replacement and schedules delayed interface cleanup',async()=>{
+test('a valid button click renders the replacement and deletes the prior Telegram card',async()=>{
  const value=env();let now=0,cleanupPromise;const store=createMemoryBotStore({clock:()=>now}),deliveries=[];
  const transport=async(url,options)=>{
   const method=url.split('/').at(-1),body=JSON.parse(options.body);deliveries.push({method,body});
   return {status:200,json:async()=>({ok:true,result:['answerCallbackQuery','deleteMessage'].includes(method)?true:{message_id:deliveries.length}})};
  };
- const handler=createWebhookHandler({env:value,sleep:async()=>{now=2500;},waitUntilTask:task=>{cleanupPromise=task;},createRuntime:runtimeEnv=>directRuntime(runtimeEnv,store,transport,()=>now)});
+ const handler=createWebhookHandler({env:value,sleep:async()=>{now=2500;},waitUntilTask:task=>{cleanupPromise=task;},fetchImpl:transport,createRuntime:runtimeEnv=>directRuntime(runtimeEnv,store,transport,()=>now)});
  const update={update_id:441,callback_query:{id:'query-441',from:{id:11},data:'cmd:menu',message:{message_id:73,chat:{id:11,type:'private'}}}};
  const result=await invoke(handler,update,value);
  assert.equal(result.statusCode,200);
  await cleanupPromise;
  assert.deepEqual(deliveries.map(item=>item.method),['answerCallbackQuery','sendMessage','deleteMessage']);
  assert.match(deliveries[1].body.text,/Bitte wähle eine Aktion/);
- const cleanup=Object.values((await store.inspect()).outbox).find(item=>item.method==='deleteMessage');
- assert.equal(cleanup.state,'sent');assert.equal(cleanup.notBefore,2000);
+ assert.ok(!Object.values((await store.inspect()).outbox).some(item=>item.method==='deleteMessage'));
  assert.deepEqual(deliveries.at(-1).body,{chat_id:'11',message_id:73});
  assert.ok(Object.values((await store.inspect()).outbox).filter(item=>item.sourceUpdateId==='441').every(item=>item.state==='sent'));
 });

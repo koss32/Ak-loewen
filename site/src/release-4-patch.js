@@ -9,7 +9,7 @@
  * (4, 6, 7 are pure styling and live in public/release-4.css)
  */
 import {translations} from './locales.js';
-import {legal} from './data.js';
+import {contacts,legal} from './data.js';
 
 const escRe=value=>String(value).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
 
@@ -35,7 +35,7 @@ export function applyRelease4(html,locale='de'){
  html=html.replace('<div class="about-mark"><img src="/assets/ak-logo.png" alt="AK-LOEWEN" width="320" height="320" loading="lazy"></div>',UNION_MARKUP);
 
  // 5 — compact Telegram CTA
- html=html.replace(/<a class="telegram-booking" href="#probetraining" aria-label="([^"]*)">[\s\S]*?<\/a>/,(m,label)=>`<a class="telegram-booking tg-compact" href="#probetraining" aria-label="${label}" title="${label}"><span class="tg-icon">${TELEGRAM_ICON}</span><span class="tg-label">${label}</span></a>`);
+ html=html.replace(/<a class="telegram-booking" href="#probetraining" aria-label="([^"]*)">[\s\S]*?<\/a>/,(m,label)=>`<a class="telegram-booking tg-compact" href="${contacts.telegram}?start=site_booking" target="_blank" rel="noopener noreferrer" aria-label="${label}" title="${label}"><span class="tg-icon">${TELEGRAM_ICON}</span><span class="tg-label">${label}</span></a>`);
 
  return html;
 }

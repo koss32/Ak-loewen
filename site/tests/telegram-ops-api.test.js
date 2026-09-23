@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import {createOpsHandler} from '../api/telegram-ops.js';
 import {runCheck,runRemoteCheck} from '../server/telegram-ops.js';
 
-const SECRET='w'.repeat(40),OPS_ORIGIN='https://release-6-preview.example';
-const env=()=>({VERCEL:'1',VERCEL_ENV:'preview',VERCEL_GIT_COMMIT_REF:'release-6',VERCEL_URL:'release-6-preview.example',TELEGRAM_OPS_PREVIEW_ORIGIN:OPS_ORIGIN,PUBLIC_ORIGIN:`${OPS_ORIGIN}/`,BOT_ENABLED:'true',BOT_WEBHOOK_ENABLED:'true',PRIVACY_PUBLICATION_STATUS:'published',PRIVACY_CONSENT_VERSION:'telegram-2026-09-15-v1',PRIVACY_URL:`${OPS_ORIGIN}/telegram-privacy/`,TELEGRAM_WORKER_SECRET:SECRET});
+const SECRET='w'.repeat(40),OPS_ORIGIN='https://release-7-preview.example';
+const env=()=>({VERCEL:'1',VERCEL_ENV:'preview',VERCEL_GIT_COMMIT_REF:'release-7',VERCEL_URL:'release-7-preview.example',TELEGRAM_OPS_PREVIEW_ORIGIN:OPS_ORIGIN,PUBLIC_ORIGIN:`${OPS_ORIGIN}/`,BOT_ENABLED:'true',BOT_WEBHOOK_ENABLED:'true',PRIVACY_PUBLICATION_STATUS:'published',PRIVACY_CONSENT_VERSION:'telegram-2026-09-15-v1',PRIVACY_URL:`${OPS_ORIGIN}/telegram-privacy/`,TELEGRAM_WORKER_SECRET:SECRET});
 const req=()=>({method:'POST',headers:{authorization:`Bearer ${SECRET}`}});
 function response(){return {headers:{},setHeader(k,v){this.headers[k]=v;},status(code){this.statusCode=code;return this;},json(body){this.body=body;return this;}};}
 

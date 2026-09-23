@@ -29,6 +29,7 @@ export const trainers = [
 ];
 export const contacts = {
  email:'aklggmbh@gmail.com',telegram:'https://t.me/ak_loewenbot',instagram:'https://www.instagram.com/VALSET_SOLINGEN/',
+ anarPhone:'+380 99 203 00 00',anarTelegram:'https://t.me/+380992030000',
  whatsappUA:'https://wa.me/380967542528',whatsappDE:'https://wa.me/4915158873852',map:'https://maps.app.goo.gl/q7yJ8i5ee1tLey8j8',trainingAddress:'Werwolf 8, 42651 Solingen'
 };
 export const legal = {
