@@ -12,7 +12,7 @@
 ## 1. Зафиксировать кандидат и cloud target
 
 - [ ] Получена явная команда владельца и отдельное одобрение smoke plan.
-- [ ] После push зафиксирован **фактический remote SHA** `release-6` в delivery record. Текущий локальный проверенный кандидат: `f5c3660407a6bae1d66d5c3ea662fe5c119c5ea4`.
+- [ ] Перед доставкой сверен фактический remote HEAD `release-6`, а после неё зафиксирован SHA доставленного коммита. Кандидат `f5c3660407a6bae1d66d5c3ea662fe5c119c5ea4` проверен в отчёте от 18.09.2026 и не равен HEAD, проверенному 23.09.2026 (`a77a4cc464c1f1aec3604d3a262e139447bc7bb0`).
 - [ ] Read-only target сверен: Vercel team `zumeeeeer-6684's projects` (`team_j4dElwkGk5L6ODyrhxQRW1N5`), project `ak-loewen-release-a` (`prj_0kG9RBjUgIn4UktNF1qYU0cCgRvU`), GitHub `koss32/Ak-loewen`.
 - [ ] Подтверждены root `site`, build `npm run build`, output `dist`, Node `24.x`, intended branch и отсутствие неожиданных commits.
 - [ ] Разобрано расхождение: remote auto-deploy metadata `createDeployments=enabled`, а checked-in `site/vercel.json` содержит `git.deploymentEnabled=false`. Не менять настройку «для удобства» без отдельного разрешения.

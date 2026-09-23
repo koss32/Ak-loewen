@@ -1,6 +1,6 @@
 # AK-LOEWEN
 
-> **Текущая рабочая точка — Release 6.** Локальная ревизия прошла финальные тесты, но Production не запускался и deployed readiness не подтверждена. Начните с [RELEASE-6-CONTINUATION.md](docs/releases/RELEASE-6-CONTINUATION.md), затем сверяйте [RELEASE-6.md](docs/releases/RELEASE-6.md) и [launch checklist](docs/releases/RELEASE-6-LAUNCH-CHECKLIST.md).
+> **Текущая рабочая ветка — `release-6`; исходники — `site/`.** Перед каждой задачей сверяйте HEAD удалённой ветки. Последняя проверка GitHub 23.09.2026: `a77a4cc464c1f1aec3604d3a262e139447bc7bb0`. Статус проверок и Production смотрите в [RELEASE-6.md](docs/releases/RELEASE-6.md); старые отчёты не подтверждают более поздние коммиты.
 
 Один репозиторий = один проект **AK-LOEWEN**: локализованный лендинг и legal-страницы, web-форма/API и Telegram booking/status/contact со staff flow. Telegram не является отдельным продуктом и не имеет отдельной нумерации.
 
@@ -11,7 +11,7 @@
 | Release 2 | исторический утверждённый baseline | `release-2` | landing |
 | Release 3 | исторический Preview/WIP | `release-3` | не текущий source of truth |
 | Release 5 | стабильный baseline | `release-5` | неизменный, SHA `c52e77dcde8548e00f2e6208b143dc87c37f811e` |
-| **Release 6** | текущая локально проверенная подготовка | `release-6` | кандидат `f5c3660407a6bae1d66d5c3ea662fe5c119c5ea4`; Production не запускался |
+| **Release 6** | текущая рабочая ветка; степень проверки зависит от коммита | `release-6` | HEAD сверять с GitHub; `f5c3660` — исторический проверенный кандидат, не текущий HEAD |
 
 ## Быстрый маршрут
 
@@ -26,7 +26,7 @@
 
 - `site/` — deployment root и приложение;
 - `docs/` — текущая документация и исторические release records;
-- `archive/` — исторические материалы, не source of truth;
+- Исторические материалы доступны в документации и истории Git; не использовать их как текущий маршрут разработки;
 - `tools/` — инструменты разработки.
 
 ## Safety defaults
