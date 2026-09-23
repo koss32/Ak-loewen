@@ -1,151 +1,17 @@
-# AI INDEX — AK-LOEWEN gGmbH × VALSET
+# AK-LOEWEN: рабочая ветка
 
-> **FIRST FILE FOR EVERY AI/AGENT.** Read this before repository-wide search.
-> Last structure verification: **2026-09-15**.
+Текущая рабочая ветка лендинга и приложения: [release-6](https://github.com/koss32/Ak-loewen/tree/release-6). Код: [site/](https://github.com/koss32/Ak-loewen/tree/release-6/site/). Проверенный remote HEAD на 23.09.2026: 626be5ead2633b9d6a3fccb6c3ad4ad8007950c8. Перед новой задачей сверяйте HEAD GitHub: записанный SHA может устареть.
 
-## CURRENT HANDOFF — update after every completed AI work
+Ak-loewen — ветка по умолчанию с навигацией и историей, а не текущим кодом. release-5 — сохранённая стабильная база (c52e77dcde8548e00f2e6208b143dc87c37f811e). release-2 и release-3 — исторические версии. Номер релиза и дата коммита сами по себе не доказывают публикацию сайта.
 
-<!-- AI-CURRENT-HANDOFF: keep this block short and current -->
-- **Current approved implementation:** `release-2`
-- **Current release-2 branch head:** `dfbb7bb4b87907bc19084d8a3e4bfb7cdaf0d0a9` — documentation/legal/redesign-routing updates only
-- **Approved website code baseline:** `c8591e0aa1e197cdcc3eb850b174c6114467b595`
-- **Implementation root:** `site/` on `release-2`
-- **Status:** `APPROVED SOURCE / NOT PRODUCTION-ACTIVATED`
-- **Start next task with:** `index.md` → `release-2/AGENTS.md` → `release-2/site/AI-MAP.md` → only task-relevant files
-- **Verified legal handoff:** `release-2/docs/legal/LEGAL-DATA-SOURCES.md`; publication drafts: `release-2/docs/legal/impressum-draft.md` and `release-2/docs/legal/telegram-privacy-draft.md`.
-- **Owner-authorized radical redesign brief:** `release-2/docs/redesign/OPUS5-RADICAL-LANDING-REDESIGN-BRIEF.md`. It is explicitly a **landing-page** redesign brief; for that task it supersedes older visual-preservation constraints while keeping factual/data/backend constraints authoritative. Current AK orange `#E85A22` must remain as roughly 20–30% of visible color presence in at least one serious color direction/state.
-- **Pending owner-requested website change:** hero/start-screen **VALSET** card should scroll to the dedicated `#valset` section; the booking/trial action inside VALSET should scroll to `#probetraining` and preserve/preselect `data-direction="valset"`. This is documented in `release-2/AGENTS.md` and is **not yet implemented**.
-- **Telegram Release 3 WIP:** `release-3` head `76dd55a4c924be51d4ae604387adb003e358eb0d`; follow-up PR branch `release-3-staff-group-membership` head `19c22ffaba17c189e89ef50e0ff5d51bbf7fee59`. Both are WIP and **not** the approved website source.
-- **Deprecated v1 marker:** `codex/site-v1` head `9884d17a7abf98e9122b61c9c42b17892946217e`; historical/recovery only
-- **Next-agent note:** Release 2 is authoritative. Do not spend context rediscovering v1/Release A/v2 unless the task explicitly asks for history/recovery/comparison.
-<!-- /AI-CURRENT-HANDOFF -->
+## Следующие файлы
 
-### Mandatory end-of-work handoff protocol
+1. [README рабочей ветки](https://github.com/koss32/Ak-loewen/blob/release-6/README.md) и [её правила](https://github.com/koss32/Ak-loewen/blob/release-6/AGENTS.md).
+2. [Текущий статус](https://github.com/koss32/Ak-loewen/blob/release-6/docs/releases/RELEASE-6.md) и [передача](https://github.com/koss32/Ak-loewen/blob/release-6/docs/releases/RELEASE-6-CONTINUATION.md). Исторические результаты проверок относятся к указанным там ревизиям.
+3. [Карта исходников](https://github.com/koss32/Ak-loewen/blob/release-6/docs/architecture/AI-MAP.md). [Спецификация v5](docs/TZ-AK-LOEWEN-gGmbH-v5-source-of-truth.md) сохраняется для исторического контекста; её старые указания о ветках не являются маршрутом разработки.
 
-Every AI/agent that makes repository changes must, before finishing:
+## Поддержка указателя
 
-1. determine the exact branch and final commit containing its work;
-2. decide whether that work is **approved/current** or only **work-in-progress** — never promote a WIP branch by assumption;
-3. update the `CURRENT HANDOFF` block above with the current approved branch/commit and any relevant WIP pointer;
-4. update the active implementation's `site/AI-MAP.md` if file ownership, architecture, endpoints, build paths or major modules changed;
-5. leave the next agent a one-paragraph route: **which branch to open, which commit is current, which 1–3 files to read first, and what remains**;
-6. never overwrite the approved pointer merely because a feature branch exists.
+При выборе владельцем новой рабочей ветки одновременно обновите index.md, README.md, AGENTS.md и docs/AI-REPOSITORY-MAP.md здесь, а также входные документы новой ветки. Запишите имя ветки, проверенный remote HEAD, дату и отдельно статус публикации. Не объявляйте ветку опубликованной или утверждённой только по свежему коммиту. Исторические записи не переписывайте как отчёты о новом релизе.
 
-If the active implementation branch changes in the future, update this file, root `AGENTS.md`, root `README.md`, the baseline routing notice, and the active branch's `AGENTS.md`/`site/AI-MAP.md` in the same handoff.
-
-## Repository identity
-
-Repository: [`koss32/Ak-loewen`](https://github.com/koss32/Ak-loewen)  
-Project: website and related implementation material for **AK-LOEWEN gGmbH × VALSET**.
-
-The default branch **`Ak-loewen` is the documentation/navigation branch**. The current website code is **not** taken from the default branch; it is on `release-2`.
-
-## Branch routing
-
-| Purpose | Branch / location | Use |
-|---|---|---|
-| Documentation + AI router | [`Ak-loewen`](https://github.com/koss32/Ak-loewen/tree/Ak-loewen) | Start here |
-| Current approved website | [`release-2/site/`](https://github.com/koss32/Ak-loewen/tree/release-2/site) | **Current code** |
-| Release 2 instructions | [`release-2/site/RELEASE-2.md`](https://github.com/koss32/Ak-loewen/blob/release-2/site/RELEASE-2.md) | Read before material changes |
-| File/function map | [`release-2/site/AI-MAP.md`](https://github.com/koss32/Ak-loewen/blob/release-2/site/AI-MAP.md) | Fast task routing |
-| Verified legal facts | [`release-2/docs/legal/LEGAL-DATA-SOURCES.md`](https://github.com/koss32/Ak-loewen/blob/release-2/docs/legal/LEGAL-DATA-SOURCES.md) | Legal/company reference facts |
-| Impressum draft | [`release-2/docs/legal/impressum-draft.md`](https://github.com/koss32/Ak-loewen/blob/release-2/docs/legal/impressum-draft.md) | Draft only; check open tax-ID question |
-| Telegram privacy draft | [`release-2/docs/legal/telegram-privacy-draft.md`](https://github.com/koss32/Ak-loewen/blob/release-2/docs/legal/telegram-privacy-draft.md) | Draft/unpublished privacy notice |
-| Opus 5 radical landing brief | [`release-2/docs/redesign/OPUS5-RADICAL-LANDING-REDESIGN-BRIEF.md`](https://github.com/koss32/Ak-loewen/blob/release-2/docs/redesign/OPUS5-RADICAL-LANDING-REDESIGN-BRIEF.md) | Owner-authorized redesign instruction |
-| Standalone Release 2 preview | [`release-2/concepts/ak-loewen-valset-release-2.html`](https://github.com/koss32/Ak-loewen/blob/release-2/concepts/ak-loewen-valset-release-2.html) | Review artifact only |
-| Baseline specification | [`docs/TZ-AK-LOEWEN-gGmbH-v5-source-of-truth.md`](https://github.com/koss32/Ak-loewen/blob/Ak-loewen/docs/TZ-AK-LOEWEN-gGmbH-v5-source-of-truth.md) | Facts not superseded by Release 2; routing notice at top |
-| Previous release baseline | [`codex/release-a`](https://github.com/koss32/Ak-loewen/tree/codex/release-a) | Historical predecessor |
-| Old v1 branch | [`codex/site-v1`](https://github.com/koss32/Ak-loewen/tree/codex/site-v1) | **DEPRECATED — do not work here** |
-| Telegram Release 3 WIP | [`release-3`](https://github.com/koss32/Ak-loewen/tree/release-3) | WIP integration branch, not approved source |
-
-## Minimal reading order
-
-For a normal website task, do **not** crawl every branch. Read only:
-
-1. this `index.md`;
-2. [`release-2/AGENTS.md`](https://github.com/koss32/Ak-loewen/blob/release-2/AGENTS.md);
-3. [`release-2/site/AI-MAP.md`](https://github.com/koss32/Ak-loewen/blob/release-2/site/AI-MAP.md);
-4. [`release-2/site/RELEASE-2.md`](https://github.com/koss32/Ak-loewen/blob/release-2/site/RELEASE-2.md) when the task can affect approved behavior/content;
-5. for legal/company facts, [`release-2/docs/legal/LEGAL-DATA-SOURCES.md`](https://github.com/koss32/Ak-loewen/blob/release-2/docs/legal/LEGAL-DATA-SOURCES.md);
-6. for the radical landing redesign specifically, [`release-2/docs/redesign/OPUS5-RADICAL-LANDING-REDESIGN-BRIEF.md`](https://github.com/koss32/Ak-loewen/blob/release-2/docs/redesign/OPUS5-RADICAL-LANDING-REDESIGN-BRIEF.md);
-7. only the exact implementation files named below for the requested task.
-
-## Task → file router
-
-| Task | First file(s) |
-|---|---|
-| prices, schedules, age groups, trainers, contacts, legal status | [`site/src/data.js`](https://github.com/koss32/Ak-loewen/blob/release-2/site/src/data.js) |
-| verified company/registry/legal handoff facts | [`docs/legal/LEGAL-DATA-SOURCES.md`](https://github.com/koss32/Ak-loewen/blob/release-2/docs/legal/LEGAL-DATA-SOURCES.md) |
-| Impressum publication draft | [`docs/legal/impressum-draft.md`](https://github.com/koss32/Ak-loewen/blob/release-2/docs/legal/impressum-draft.md) |
-| Telegram bot privacy draft | [`docs/legal/telegram-privacy-draft.md`](https://github.com/koss32/Ak-loewen/blob/release-2/docs/legal/telegram-privacy-draft.md) |
-| radical Opus landing redesign | [`docs/redesign/OPUS5-RADICAL-LANDING-REDESIGN-BRIEF.md`](https://github.com/koss32/Ak-loewen/blob/release-2/docs/redesign/OPUS5-RADICAL-LANDING-REDESIGN-BRIEF.md) |
-| DE/RU/UK/TR general copy | [`site/src/locales.js`](https://github.com/koss32/Ak-loewen/blob/release-2/site/src/locales.js) |
-| booking/family/first-visit Release 2 copy | [`booking-copy.js`](https://github.com/koss32/Ak-loewen/blob/release-2/site/src/booking-copy.js), [`family-copy.js`](https://github.com/koss32/Ak-loewen/blob/release-2/site/src/family-copy.js), [`first-visit-copy.js`](https://github.com/koss32/Ak-loewen/blob/release-2/site/src/first-visit-copy.js) |
-| section HTML, form markup, page composition | [`site/src/render.js`](https://github.com/koss32/Ak-loewen/blob/release-2/site/src/render.js) |
-| styling, responsive layout, themes | [`site/public/style.css`](https://github.com/koss32/Ak-loewen/blob/release-2/site/public/style.css) |
-| form UX, locale switching, menus, schedule filtering, glove motion | [`site/public/client.js`](https://github.com/koss32/Ak-loewen/blob/release-2/site/public/client.js) |
-| reveal/entrance animation | [`site/public/scroll-motion.js`](https://github.com/koss32/Ak-loewen/blob/release-2/site/public/scroll-motion.js) |
-| ScrollCraft engine | [`site/public/vendor/`](https://github.com/koss32/Ak-loewen/tree/release-2/site/public/vendor) — vendor; edit only for engine-specific work |
-| request validation | [`site/server/validate-request.js`](https://github.com/koss32/Ak-loewen/blob/release-2/site/server/validate-request.js) |
-| Telegram lead message formatting | [`site/src/trial-message.js`](https://github.com/koss32/Ak-loewen/blob/release-2/site/src/trial-message.js) |
-| local Telegram delivery / SQLite | [`site/server/trial-requests.js`](https://github.com/koss32/Ak-loewen/blob/release-2/site/server/trial-requests.js) |
-| hosted Telegram delivery / Upstash / idempotency | [`site/server/hosted-trial.js`](https://github.com/koss32/Ak-loewen/blob/release-2/site/server/hosted-trial.js) |
-| Vercel request boundary | [`site/api/trial-requests.js`](https://github.com/koss32/Ak-loewen/blob/release-2/site/api/trial-requests.js) |
-| local HTTP server | [`site/server.js`](https://github.com/koss32/Ak-loewen/blob/release-2/site/server.js) |
-| build / standalone preview generation | [`site/build.js`](https://github.com/koss32/Ak-loewen/blob/release-2/site/build.js) |
-| Vercel build/security config | [`site/vercel.json`](https://github.com/koss32/Ak-loewen/blob/release-2/site/vercel.json) |
-| environment variable names | [`site/.env.example`](https://github.com/koss32/Ak-loewen/blob/release-2/site/.env.example) — values must remain secret |
-| tests / QA | [`site/tests/`](https://github.com/koss32/Ak-loewen/tree/release-2/site/tests) |
-| visual evidence | [`site/evidence/`](https://github.com/koss32/Ak-loewen/tree/release-2/site/evidence) |
-
-## Directory map
-
-### `Ak-loewen` documentation branch
-
-- `docs/` — specifications and AI repository documentation.
-- `assets/` — source/reference brand images.
-- `concepts/` — historical concept artifacts on this branch; not current code.
-- `references/` — historical/reference HTML.
-- `scripts/` — concept/document maintenance helpers.
-
-### `release-2` current implementation
-
-- `docs/legal/` — verified legal/company handoff facts plus draft Impressum/privacy texts.
-- `docs/redesign/` — owner-authorized redesign briefs; not implementation source.
-- `site/src/` — project facts, translations, render functions, Telegram message formatter.
-- `site/public/` — CSS, browser JS, runtime images, ScrollCraft vendor runtime.
-- `site/server/` — validation and delivery services.
-- `site/api/` — Vercel/serverless endpoint.
-- `site/tests/` — tests and QA scripts.
-- `site/evidence/` — screenshots/evidence.
-- `site/scrollcraft/` — supporting ScrollCraft material; not a second app source.
-- `site/build.js`, `server.js`, `vercel.json`, `package.json` — build/runtime/config entrypoints.
-
-## Non-negotiable facts
-
-- Organization: **AK-LOEWEN gGmbH × VALSET**.
-- Current code source: **`release-2/site/`**.
-- Four locales: **DE / RU / UK / TR**.
-- AK palette in approved Release 2: `#E85A22`, `#C4501E`, `#FF7A3D`; `#FE4123` is not the required brand color. The radical landing redesign brief may change the wider palette but explicitly retains `#E85A22` as a visible brand signal.
-- VALSET keeps its navy/blue/yellow system in approved Release 2 unless an explicit current owner redesign instruction supersedes that visual constraint.
-- Do not invent schedules, prices, contacts, trainer facts, achievements, legal text or testimonials.
-- Keep secrets server-side. Never commit tokens or credentials.
-- Do not enable real form delivery, send test leads, configure production webhook/secrets, or deploy production without explicit owner authorization.
-- Historical test results do not validate new changes. State exactly what was actually rerun.
-
-## Authority order if documents disagree
-
-1. explicit current owner instruction;
-2. the `CURRENT HANDOFF` block in this file for routing only;
-3. current implementation branch `AGENTS.md` + `site/RELEASE-2.md` for approved Release 2 behavior;
-4. task-specific current owner brief such as the Opus landing redesign brief for that task's visual/structural instructions;
-5. verified legal handoff files for legal/company facts;
-6. baseline specification for facts not superseded by Release 2;
-7. older Release A / v1 / v2 material only as history.
-
-## Deep map
-
-Repository/branch/dependency details: [`docs/AI-REPOSITORY-MAP.md`](docs/AI-REPOSITORY-MAP.md).  
-Implementation-level file/function details: [`release-2/site/AI-MAP.md`](https://github.com/koss32/Ak-loewen/blob/release-2/site/AI-MAP.md).
-
-Use these maps instead of blind repository search.
+Этот указатель не разрешает включать Production или внешние интеграции.

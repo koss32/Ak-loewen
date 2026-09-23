@@ -1,12 +1,12 @@
 # AK-LOEWEN gGmbH website specification
 
-> ## Current routing notice — 2026-09-14
+> ## Routing notice — updated 2026-09-23
 >
 > This specification remains the **baseline source for project facts and requirements**, but its original `codex/site-v1` implementation-routing instructions are historical.
 >
 > **Do not use `codex/site-v1` for new implementation work.** Always read the live router first: [`../index.md`](../index.md).
 >
-> At the time of this notice, the current owner-approved implementation is `release-2/site/`; approved website code baseline: `c8591e0aa1e197cdcc3eb850b174c6114467b595`. Release 2 decisions documented in `release-2/site/RELEASE-2.md` supersede conflicting older implementation details. The routing pointer in `index.md` must be used if a later approved release replaces Release 2.
+> The current working implementation is in `release-6/site/`. Use the routing pointer in `index.md` and verify the remote branch HEAD before implementation work. This specification is historical context for facts and requirements; earlier release instructions do not override the current branch's documentation.
 
 ## Binding source of truth
 
@@ -61,7 +61,7 @@ The original v5 plan was:
 1. Release A: visual and functional improvements, content, locales, navigation, forms, legal pages, responsive behavior and QA.
 2. Release B: scroll motion and microinteractions, only after written approval of Release A.
 
-Release 2 now contains later owner-approved changes. For current status, read `index.md` and `release-2/site/RELEASE-2.md`.
+Later releases supersede this document's historical implementation routing. For current status, read `index.md` and the active branch's release documents.
 
 Do not invent schedules, prices, contacts, legal data, trainer facts or VALSET age criteria. Keep unresolved data explicitly pending.
 
