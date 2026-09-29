@@ -13,12 +13,12 @@
   if(played)return;played=true;
   stage.classList.add('is-joined');
   if(instant){impact();return;}
-  setTimeout(impact,900);
+  setTimeout(impact,260);
  };
  if(reduce.matches||!('IntersectionObserver' in window)){join(true);return;}
  const observer=new IntersectionObserver(entries=>{
   for(const entry of entries)if(entry.isIntersecting){join(false);observer.disconnect();}
- },{threshold:.35,rootMargin:'0px 0px -8% 0px'});
+ },{threshold:0,rootMargin:'0px 0px 1% 0px'});
  observer.observe(stage);
  reduce.addEventListener('change',()=>{if(reduce.matches)join(true);});
 
