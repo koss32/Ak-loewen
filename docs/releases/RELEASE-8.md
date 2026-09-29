@@ -14,5 +14,6 @@
 ## Публикация
 
 - Vercel-проект: `ak-loewen-release-a`.
-- Preview deployment и GitHub SHA будут добавлены после публикации Release 8.
+- GitHub: ветка `release-8`, коммит `6d7b815` (`Release 8: refine scroll animation system`).
+- Vercel Preview пока не создан: локальная CLI завершилась с `Not authorized`, автоматического deployment после push в списке проекта нет.
 - Production Release 7 остаётся без изменений до отдельной проверки Preview.
