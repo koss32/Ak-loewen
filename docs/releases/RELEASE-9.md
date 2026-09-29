@@ -13,5 +13,8 @@
 ## Публикация
 
 - Vercel-проект: `ak-loewen-release-a`.
-- Preview deployment и GitHub SHA будут добавлены после публикации Release 9.
+- GitHub: ветка `release-9`, коммит `e925fdb` (`Release 9: fix entry redirect and default dark theme`).
+- Vercel Preview: deployment `dpl_7unavRXKzC5xaRxBGqEVU9mV4bsE`, состояние `READY`, target `preview`.
+- Preview URL: https://ak-loewen-release-i1sx6pxpn-zumeeeeer-6684s-projects.vercel.app/de/.
+- Проверка Preview: корень отвечает `307 Location: /de/`, немецкая страница и standalone artifact отвечают `200`; Production не менялся.
 - Production Release 8 остаётся без изменений до отдельной проверки Preview.
