@@ -15,5 +15,7 @@
 
 - Vercel-проект: `ak-loewen-release-a`.
 - GitHub: ветка `release-8`, коммит `6d7b815` (`Release 8: refine scroll animation system`).
-- Vercel Preview пока не создан: локальная CLI завершилась с `Not authorized`, автоматического deployment после push в списке проекта нет.
+- Vercel Preview: deployment `dpl_UERF3XQfr6U9BGspWQSTXXzXTzjv`, состояние `READY`, target `preview`.
+- Preview URL: https://ak-loewen-release-ee2iet5ds-zumeeeeer-6684s-projects.vercel.app/de/.
+- На Preview главная и standalone Release 8 отвечают `200`; `X-Robots-Tag: noindex, nofollow`. Form delivery отключена build-time override `FORM_DELIVERY_ENABLED=false`; Production не менялся.
 - Production Release 7 остаётся без изменений до отдельной проверки Preview.
