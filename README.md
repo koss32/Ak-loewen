@@ -1,6 +1,6 @@
 # AK-LOEWEN
 
-> **Текущая рабочая ветка — `release-8`; исходники — `site/`.** Релиз 8 продолжает `release-7`. Перед работой сверяйте удалённый HEAD, а статус публикации — в [RELEASE-8.md](docs/releases/RELEASE-8.md).
+> **Текущая рабочая ветка — `release-9`; исходники — `site/`.** Релиз 8 продолжает `release-7`. Перед работой сверяйте удалённый HEAD, а статус публикации — в [RELEASE-9.md](docs/releases/RELEASE-9.md).
 
 Один репозиторий = один проект **AK-LOEWEN**: локализованный лендинг и legal-страницы, web-форма/API и Telegram booking/status/contact со staff flow. Telegram не является отдельным продуктом и не имеет отдельной нумерации.
 
@@ -13,11 +13,11 @@
 | Release 5 | стабильный baseline | `release-5` | неизменный, SHA `c52e77dcde8548e00f2e6208b143dc87c37f811e` |
 | Release 6 | предыдущая рабочая ветка | `release-6` | исторические проверки относятся к конкретным коммитам |
 | Release 7 | предыдущая рабочая ветка | `release-7` | предыдущий проверенный релиз |
-| **Release 8** | текущая рабочая ветка | `release-8` | обновлённая система scroll-анимаций |
+| **Release 9** | текущая рабочая ветка | `release-9` | обновлённая система scroll-анимаций |
 
 ## Быстрый маршрут
 
-1. Текущий release status: [`docs/releases/RELEASE-8.md`](docs/releases/RELEASE-8.md).
+1. Текущий release status: [`docs/releases/RELEASE-9.md`](docs/releases/RELEASE-9.md).
 2. Исторические ограничения и проверки Release 6: [`docs/releases/RELEASE-6.md`](docs/releases/RELEASE-6.md).
 3. Будущий безопасный порядок запуска (не разрешение): [`docs/releases/RELEASE-6-LAUNCH-CHECKLIST.md`](docs/releases/RELEASE-6-LAUNCH-CHECKLIST.md).
 4. Карта ownership: [`docs/architecture/AI-MAP.md`](docs/architecture/AI-MAP.md).

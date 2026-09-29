@@ -13,10 +13,10 @@ Telegram — часть приложения, а не отдельный про�
 ## Текущий релиз
 
 - `release-5` — стабильный утверждённый baseline: `c52e77dcde8548e00f2e6208b143dc87c37f811e`.
-- `release-8` — рабочая ветка текущего продолжения; `release-7` — предыдущий релиз. Кандидатный SHA берётся из проверенного HEAD; synthetic SHA не используется.
-- Перед изменениями сверяйте `origin/release-8` с GitHub и отделяйте текущий HEAD от SHA старых проверок. Ветка по умолчанию `Ak-loewen` — навигация, а не исходник текущего лендинга.
+- `release-9` — рабочая ветка текущего продолжения; `release-7` — предыдущий релиз. Кандидатный SHA берётся из проверенного HEAD; synthetic SHA не используется.
+- Перед изменениями сверяйте `origin/release-9` с GitHub и отделяйте текущий HEAD от SHA старых проверок. Ветка по умолчанию `Ak-loewen` — навигация, а не исходник текущего лендинга.
 - `RELEASE-2.md` и `RELEASE-3.md` — исторические записи, не текущий source of truth.
-- Статус текущего релиза: `docs/releases/RELEASE-8.md`. Отчёты `RELEASE-7.md`, `RELEASE-6.md` и `release-6-evidence/` относятся к предыдущим релизам.
+- Статус текущего релиза: `docs/releases/RELEASE-9.md`. Отчёты `RELEASE-7.md`, `RELEASE-6.md` и `release-6-evidence/` относятся к предыдущим релизам.
 
 Не создавайте отдельные версии для сайта, бота, handoff, preview или подсистем.
 
@@ -41,7 +41,7 @@ Telegram — часть приложения, а не отдельный про�
 - `site/server/` — runtime, validation, Redis, Telegram и form services.
 - `site/server/indexing-config.js` — единая политика indexing/robots/sitemap.
 - `site/middleware.js` — request-time `X-Robots-Tag`, robots и canonical-host gate через Vercel proxy entrypoint.
-- `site/build.js` — очищает и генерирует `dist`, localized/legal pages, robots и standalone Release 8 review artifact.
+- `site/build.js` — очищает и генерирует `dist`, localized/legal pages, robots и standalone Release 9 review artifact.
 - `site/tests/` — тесты всего приложения.
 - `docs/` — текущая документация; `archive/` — только исторический материал; `tools/` — development tools.
 

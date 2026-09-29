@@ -5,10 +5,9 @@
  const errorKeys={};
  const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
  const reduce=matchMedia('(prefers-reduced-motion: reduce)');
- const systemTheme=matchMedia('(prefers-color-scheme: light)');
  let selectedTheme='';try{selectedTheme=localStorage.getItem('ak-theme')||'';}catch{}
- function applyTheme(){const light=selectedTheme==='light'||(!selectedTheme&&systemTheme.matches);document.documentElement.dataset.theme=light?'light':'dark';document.querySelector('meta[name="theme-color"]').content=light?'#f5f5f3':'#0F0F11';$$('[data-theme-toggle]').forEach(button=>button.setAttribute('aria-pressed',String(light)));}
- applyTheme();systemTheme.addEventListener('change',applyTheme);
+ function applyTheme(){const light=selectedTheme==='light';document.documentElement.dataset.theme=light?'light':'dark';document.querySelector('meta[name="theme-color"]').content=light?'#f5f5f3':'#0F0F11';$$('[data-theme-toggle]').forEach(button=>button.setAttribute('aria-pressed',String(light)));}
+ applyTheme();
  document.addEventListener('click',event=>{if(!event.target.closest('[data-theme-toggle]'))return;selectedTheme=document.documentElement.dataset.theme==='light'?'dark':'light';try{localStorage.setItem('ak-theme',selectedTheme);}catch{}applyTheme();});
  const value=id=>document.getElementById(id)?.value||'';
  const groupById=id=>config.groups.find(g=>g.id===id);
