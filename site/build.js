@@ -13,7 +13,7 @@ if(process.env.FORM_DELIVERY_ENABLED==='true'&&!live)throw new Error(`Form deliv
 if(process.env.VERCEL_ENV==='production'&&process.env.INDEXING_ENABLED==='true'&&!indexing.enabled)throw new Error('Production indexing requires verified Vercel production metadata and a valid HTTPS PUBLIC_ORIGIN');
 const pages={};
 for(const l of locales){pages[l]={};for(const p of ['','impressum','datenschutz']){const html=render(l,p,live,indexing.origin||'',indexing.enabled);await mkdir(`dist/${l}/${p}`,{recursive:true});await writeFile(`dist/${l}/${p?p+'/':''}index.html`,html);pages[l][p||'home']=render(l,p,false);}}
-await writeFile('dist/index.html',renderEntryPage(indexing.origin||'',indexing.enabled));
+await writeFile('dist/index.html',render('de','',live,indexing.origin||'',indexing.enabled));
 await writeFile('dist/robots.txt',robotsText(indexing));
 const sitemap=sitemapXml(indexing);
 if(sitemap)await writeFile('dist/sitemap.xml',sitemap);
