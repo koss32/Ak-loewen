@@ -18,3 +18,6 @@
 - Preview URL: https://ak-loewen-release-i1sx6pxpn-zumeeeeer-6684s-projects.vercel.app/de/.
 - Проверка Preview: корень отвечает `307 Location: /de/`, немецкая страница и standalone artifact отвечают `200`; Production не менялся.
 - Production Release 8 остаётся без изменений до отдельной проверки Preview.
+
+- Production deployment: dpl_HFptxnsKvGs5z7BWNoPxqYJfeDbG, состояние READY; алиас https://www.ak-loewen.de обновлён.
+- Production / и /de/ отвечают 200 и отдают полноценную немецкую страницу без entry-screen.
