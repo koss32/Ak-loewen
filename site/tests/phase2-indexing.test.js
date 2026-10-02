@@ -29,7 +29,7 @@ test('origin validation rejects hidden control characters and normalizes one tra
 test('HTML robots, normalized canonicals and legal locale pages share explicit indexing policy',()=>{
  for(const locale of ['de','ru','uk','tr'])for(const page of ['','impressum','datenschutz']){
   const hidden=render(locale,page,false,production.PUBLIC_ORIGIN);assert.match(hidden,/<meta name="robots" content="noindex,nofollow">/);
-  const html=render(locale,page,false,production.PUBLIC_ORIGIN,true);assert.match(html,/<meta name="robots" content="index,follow">/);assert.ok(html.includes(`href="https://ak.example/${locale}/${page?page+'/':''}"`));assert.ok(!html.includes('ak.example//'));assert.match(html,/data-live="false"|class="legal-page/);
+  const html=render(locale,page,false,production.PUBLIC_ORIGIN,true);assert.match(html,/<meta name="robots" content="index,follow">/);const expected=!page&&locale==='de'?'https://ak.example/':`https://ak.example/${locale}/${page?page+'/':''}`;assert.ok(html.includes(`href="${expected}"`));assert.ok(!html.includes('ak.example//'));assert.match(html,/data-live="false"|class="legal-page/);
  }
  assert.match(renderEntryPage(production.PUBLIC_ORIGIN,true),/content="index,follow"/);assert.match(renderEntryPage(),/content="noindex,nofollow"/);
  assert.match(render('de','',false,'https://ak.example/path',true),/content="noindex,nofollow"/);
@@ -52,7 +52,7 @@ test('request-time robots and sitemap stay closed on wrong host even for a produ
  assert.equal(middleware(new Request('https://deployment.vercel.app/sitemap.xml')).status,404);
  assert.match(await middleware(new Request('https://ak.example/robots.txt')).text(),/Sitemap: https:\/\/ak\.example\/sitemap\.xml/);
  assert.equal(middleware(new Request('https://ak.example/sitemap.xml')).headers.get('x-middleware-next'),'1');
- const xml=sitemapXml(assessIndexing(production));assert.equal((xml.match(/<url>/g)||[]).length,13);assert.ok(!xml.includes('/api/'));assert.ok(!xml.includes('ak.example//'));
+ const xml=sitemapXml(assessIndexing(production));assert.equal((xml.match(/<url>/g)||[]).length,12);assert.ok(!xml.includes('https://ak.example/de/</loc>'));assert.ok(!xml.includes('/api/'));assert.ok(!xml.includes('ak.example//'));
 });
 
 test('Vercel keeps exactly one conditional robots-header authority and never enables auto deployments',async()=>{
