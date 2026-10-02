@@ -21,6 +21,6 @@ export function robotsText({enabled,origin}){
 
 export function sitemapXml({enabled,origin}){
  if(!enabled)return null;
- const paths=['/',...['de','ru','uk','tr'].flatMap(locale=>['','impressum/','datenschutz/'].map(page=>`/${locale}/${page}`))];
+ const paths=['/','/ru/','/uk/','/tr/',...['de','ru','uk','tr'].flatMap(locale=>['impressum/','datenschutz/'].map(page=>`/${locale}/${page}`))];
  return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+paths.map(path=>`  <url><loc>${origin}${path}</loc></url>`).join('\n')+'\n</urlset>\n';
 }
