@@ -50,8 +50,13 @@ test('request-time robots and sitemap stay closed on wrong host even for a produ
  const middleware=createIndexingMiddleware(production);
  assert.equal(await middleware(new Request('https://deployment.vercel.app/robots.txt')).text(),'User-agent: *\nDisallow: /\n');
  assert.equal(middleware(new Request('https://deployment.vercel.app/sitemap.xml')).status,404);
- assert.match(await middleware(new Request('https://ak.example/robots.txt')).text(),/Sitemap: https:\/\/ak\.example\/sitemap\.xml/);
- assert.equal(middleware(new Request('https://ak.example/sitemap.xml')).headers.get('x-middleware-next'),'1');
+ const robots=middleware(new Request('https://ak.example/robots.txt'));
+ assert.match(await robots.text(),/Sitemap: https:\/\/ak\.example\/sitemap\.xml/);
+ assert.equal(robots.headers.get('x-robots-tag'),null);
+ assert.equal(robots.headers.get('cache-control'),'public, max-age=60, must-revalidate');
+ const sitemap=middleware(new Request('https://ak.example/sitemap.xml'));
+ assert.equal(sitemap.headers.get('x-middleware-next'),'1');
+ assert.equal(sitemap.headers.get('x-robots-tag'),null);
  const xml=sitemapXml(assessIndexing(production));assert.equal((xml.match(/<url>/g)||[]).length,12);assert.ok(!xml.includes('https://ak.example/de/</loc>'));assert.ok(!xml.includes('/api/'));assert.ok(!xml.includes('ak.example//'));
 });
 
