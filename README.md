@@ -1,3 +1,13 @@
+# AK Löwen · Website und Telegram-Integration
+
+Mehrsprachige Sportclub-Website mit Probetraining-Anfragen, serverseitiger Validierung und Telegram-Abläufen für Kunden und Team.
+
+**Für Arbeitgeber:** [Projektportfolio auf Deutsch](https://github.com/koss32/Projects) · [Technische Projektbeschreibung und geprüfte Codebeispiele](https://github.com/koss32/Projects/blob/main/docs/AK-LOEWEN.md)
+
+Die Portfolio-Beschreibung benennt die gesichtete Code-Revision und den Umfang der lokalen Prüfungen. Die Entwicklungsnavigation darunter bleibt separat erhalten.
+
+---
+
 # AK-LOEWEN
 
 Ветка Ak-loewen хранит навигацию и историю. **Текущая рабочая версия лендинга и приложения — [release-6/site/](https://github.com/koss32/Ak-loewen/tree/release-6/site/).**
